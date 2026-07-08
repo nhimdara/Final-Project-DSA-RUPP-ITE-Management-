@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from database.db import execute, fetch_all, fetch_one
+from database.db import execute, execute_insert, fetch_all, fetch_one
 from models.course import Course
 
 
@@ -21,6 +21,19 @@ LEFT JOIN teachers t ON t.id = c.teacher_id
 
 
 class CourseController:
+    @staticmethod
+    def _normalize_optional_id(value: int | None) -> int | None:
+        if value is None:
+            return None
+        if value <= 0:
+            return None
+        return value
+
+    @staticmethod
+    def _validate_positive(value: int, label: str) -> None:
+        if value <= 0:
+            raise ValueError(f"{label} must be greater than zero.")
+
     def add_course(
         self,
         code: str,
@@ -33,7 +46,10 @@ class CourseController:
         name = name.strip()
         if not code or not name:
             raise ValueError("Course code and name are required.")
-        course_id = execute(
+        self._validate_positive(department_id, "Department ID")
+        self._validate_positive(credits, "Credits")
+        teacher_id = self._normalize_optional_id(teacher_id)
+        course_id = execute_insert(
             """
             INSERT INTO courses (code, name, department_id, teacher_id, credits)
             VALUES (?, ?, ?, ?, ?)
@@ -53,7 +69,10 @@ class CourseController:
         return [Course.from_row(row) for row in rows]
 
     def courses_for_department(self, department_id: int) -> list[Course]:
-        rows = fetch_all(f"{COURSE_SELECT} WHERE c.department_id = ? ORDER BY c.code", (department_id,))
+        rows = fetch_all(
+            f"{COURSE_SELECT} WHERE c.department_id = ? ORDER BY c.code",
+            (department_id,),
+        )
         return [Course.from_row(row) for row in rows]
 
     def courses_for_student(self, student_id: str) -> list[Course]:
@@ -70,14 +89,17 @@ class CourseController:
         return [Course.from_row(row) for row in rows]
 
     def search_courses(self, keyword: str) -> list[Course]:
-        keyword = f"%{keyword.strip()}%"
+        keyword = keyword.strip()
+        if not keyword:
+            return self.list_courses()
+        like_keyword = f"%{keyword}%"
         rows = fetch_all(
             f"""
             {COURSE_SELECT}
             WHERE c.code LIKE ? OR c.name LIKE ? OR d.name LIKE ?
             ORDER BY c.code
             """,
-            (keyword, keyword, keyword),
+            (like_keyword, like_keyword, like_keyword),
         )
         return [Course.from_row(row) for row in rows]
 
@@ -90,15 +112,20 @@ class CourseController:
         teacher_id: int | None = None,
         credits: int = 3,
     ) -> Course:
-        if not code.strip() or not name.strip():
+        code = code.strip().upper()
+        name = name.strip()
+        if not code or not name:
             raise ValueError("Course code and name are required.")
+        self._validate_positive(department_id, "Department ID")
+        self._validate_positive(credits, "Credits")
+        teacher_id = self._normalize_optional_id(teacher_id)
         execute(
             """
             UPDATE courses
             SET code = ?, name = ?, department_id = ?, teacher_id = ?, credits = ?
             WHERE id = ?
             """,
-            (code.strip().upper(), name.strip(), department_id, teacher_id, credits, course_id),
+            (code, name, department_id, teacher_id, credits, course_id),
         )
         return self.get_course(course_id)
 

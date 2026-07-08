@@ -2,7 +2,27 @@ from __future__ import annotations
 
 from controllers.department_controller import DepartmentController
 from controllers.teacher_controller import TeacherController
-from views.menu import menu_choice, pause, print_table, prompt_int, prompt_optional, prompt_required, show_error, show_success, yes_no
+from views.menu import (
+    menu_choice,
+    pause,
+    print_table,
+    prompt_int,
+    prompt_optional,
+    prompt_required,
+    show_error,
+    show_success,
+    yes_no,
+)
+
+
+TEACHER_TABLE_COLUMNS = [
+    ("id", "ID"),
+    ("name", "Name"),
+    ("email", "Email"),
+    ("phone", "Phone"),
+    ("department", "Department"),
+    ("user_id", "User ID"),
+]
 
 
 class TeacherView:
@@ -56,7 +76,7 @@ class TeacherView:
             }
             for teacher in self.controller.list_teachers()
         ]
-        print_table(rows, [("id", "ID"), ("name", "Name"), ("email", "Email"), ("phone", "Phone"), ("department", "Department"), ("user_id", "User ID")])
+        print_table(rows, TEACHER_TABLE_COLUMNS)
 
     def add_teacher(self) -> None:
         try:
@@ -94,7 +114,8 @@ class TeacherView:
             if teacher_id is None:
                 return
             teacher = self.controller.get_teacher(teacher_id)
-            if yes_no(f"Delete {teacher.name}", default=False) and self.controller.delete_teacher(teacher_id):
+            if yes_no(f"Delete {teacher.name}", default=False):
+                self.controller.delete_teacher(teacher_id)
                 show_success("Teacher deleted.")
         except Exception as exc:
             show_error(exc)

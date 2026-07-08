@@ -1,7 +1,24 @@
 from __future__ import annotations
 
 from controllers.department_controller import DepartmentController
-from views.menu import menu_choice, pause, print_table, prompt_int, prompt_optional, prompt_required, show_error, show_success
+from views.menu import (
+    menu_choice,
+    pause,
+    print_table,
+    prompt_int,
+    prompt_optional,
+    prompt_required,
+    show_error,
+    show_success,
+    yes_no,
+)
+
+
+DEPARTMENT_TABLE_COLUMNS = [
+    ("id", "ID"),
+    ("name", "Name"),
+    ("description", "Description"),
+]
 
 
 class DepartmentView:
@@ -39,7 +56,7 @@ class DepartmentView:
 
     def list_departments(self) -> None:
         rows = [dept.to_record() for dept in self.controller.list_departments()]
-        print_table(rows, [("id", "ID"), ("name", "Name"), ("description", "Description")])
+        print_table(rows, DEPARTMENT_TABLE_COLUMNS)
 
     def add_department(self) -> None:
         try:
@@ -54,7 +71,7 @@ class DepartmentView:
     def search_departments(self) -> None:
         keyword = prompt_required("Search keyword")
         rows = [dept.to_record() for dept in self.controller.search_departments(keyword)]
-        print_table(rows, [("id", "ID"), ("name", "Name"), ("description", "Description")])
+        print_table(rows, DEPARTMENT_TABLE_COLUMNS)
 
     def update_department(self) -> None:
         try:
@@ -76,9 +93,9 @@ class DepartmentView:
             dept_id = prompt_int("Department ID", minimum=1)
             if dept_id is None:
                 return
-            if self.controller.delete_department(dept_id):
+            department = self.controller.get_department(dept_id)
+            if yes_no(f"Delete department {department.name}", default=False):
+                self.controller.delete_department(dept_id)
                 show_success("Department deleted.")
-            else:
-                print("Department not found.")
         except Exception as exc:
             show_error(exc)

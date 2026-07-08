@@ -1,14 +1,14 @@
 from __future__ import annotations
 
-from database.db import execute
-from data_structures.graph import build_academic_graph
-from models.report import Report
-from reports.report_generator import ReportGenerator
 from controllers.course_controller import CourseController
 from controllers.department_controller import DepartmentController
 from controllers.performance_controller import PerformanceController
 from controllers.score_controller import ScoreController
 from controllers.student_controller import StudentController
+from database.db import execute
+from data_structures.graph import build_academic_graph
+from models.report import Report
+from reports.report_generator import ReportGenerator
 
 
 class ReportController:
@@ -61,7 +61,18 @@ class ReportController:
         )
 
     def performance_report(self) -> Report:
-        rows = self.performance.top_students(limit=50)
+        ranked_students = self.performance.top_students(limit=50)
+        rows = [
+            {
+                "Student ID": student["student_id"],
+                "Student": student["student_name"],
+                "Department": student["department"],
+                "Average": student["average_score"],
+                "Grade": student["grade"],
+                "Subjects": student["subjects"],
+            }
+            for student in ranked_students
+        ]
         return Report(
             title="Performance Report",
             report_type="performance",

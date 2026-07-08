@@ -2,13 +2,22 @@ from __future__ import annotations
 
 from typing import Optional
 
-from database.db import execute, fetch_all, fetch_one
+from database.db import execute, execute_insert, fetch_all, fetch_one
 from models.user import ROLES, User, hash_password, verify_password
+
+
+def _normalize_linked_student_id(student_id: Optional[str]) -> Optional[str]:
+    if student_id is None:
+        return None
+    return student_id.strip().upper() or None
 
 
 class AuthenticationService:
     def authenticate(self, username: str, password: str) -> Optional[User]:
-        row = fetch_one("SELECT * FROM users WHERE username = ?", (username.strip(),))
+        username = username.strip().lower()
+        if not username or not password:
+            return None
+        row = fetch_one("SELECT * FROM users WHERE LOWER(username) = ?", (username,))
         if row is None:
             return None
         user = User.from_row(row)
@@ -24,7 +33,7 @@ class AuthenticationService:
         full_name: str,
         linked_student_id: Optional[str] = None,
     ) -> User:
-        username = username.strip()
+        username = username.strip().lower()
         role = role.strip().lower()
         full_name = full_name.strip()
         if not username:
@@ -33,12 +42,20 @@ class AuthenticationService:
             raise ValueError("Password is required.")
         if role not in ROLES:
             raise ValueError(f"Role must be one of: {', '.join(ROLES)}.")
-        user_id = execute(
+        if not full_name:
+            raise ValueError("Full name is required.")
+        user_id = execute_insert(
             """
             INSERT INTO users (username, password_hash, role, full_name, linked_student_id)
             VALUES (?, ?, ?, ?, ?)
             """,
-            (username, hash_password(password), role, full_name, linked_student_id or None),
+            (
+                username,
+                hash_password(password),
+                role,
+                full_name,
+                _normalize_linked_student_id(linked_student_id),
+            ),
         )
         return self.get_user(user_id)
 

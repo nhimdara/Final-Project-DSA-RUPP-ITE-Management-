@@ -3,7 +3,26 @@ from __future__ import annotations
 from controllers.admin_controller import AdminController
 from controllers.user_controller import UserController
 from models.user import ROLES
-from views.menu import menu_choice, pause, print_table, prompt_int, prompt_optional, prompt_required, show_error, show_success, yes_no
+from views.menu import (
+    menu_choice,
+    pause,
+    print_table,
+    prompt_int,
+    prompt_optional,
+    prompt_required,
+    show_error,
+    show_success,
+    yes_no,
+)
+
+
+USER_TABLE_COLUMNS = [
+    ("id", "ID"),
+    ("username", "Username"),
+    ("role", "Role"),
+    ("name", "Name"),
+    ("student", "Linked Student"),
+]
 
 
 class AdminView:
@@ -55,7 +74,7 @@ class AdminView:
             }
             for user in self.users.list_users()
         ]
-        print_table(rows, [("id", "ID"), ("username", "Username"), ("role", "Role"), ("name", "Name"), ("student", "Linked Student")])
+        print_table(rows, USER_TABLE_COLUMNS)
 
     def create_user(self) -> None:
         try:
@@ -82,7 +101,11 @@ class AdminView:
                 prompt_required("Username", current.username),
                 prompt_required("Role", current.role),
                 prompt_required("Full name", current.full_name),
-                prompt_optional("Linked student ID", current.linked_student_id or "").upper() or None,
+                prompt_optional(
+                    "Linked student ID",
+                    current.linked_student_id or "",
+                ).upper()
+                or None,
                 prompt_optional("New password (blank to keep)"),
             )
             show_success(f"User {user.username} updated.")
@@ -95,7 +118,8 @@ class AdminView:
             if user_id is None:
                 return
             user = self.users.get_user(user_id)
-            if yes_no(f"Delete user {user.username}", default=False) and self.users.delete_user(user_id):
+            if yes_no(f"Delete user {user.username}", default=False):
+                self.users.delete_user(user_id)
                 show_success("User deleted.")
         except Exception as exc:
             show_error(exc)

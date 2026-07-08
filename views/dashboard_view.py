@@ -108,10 +108,10 @@ class DashboardView:
             pause()
 
     def _student_menu(self, user: User) -> None:
-        student_id = self._linked_student_id(user)
+        student_id, student_name = self._select_student(user)
         while self.auth.is_logged_in():
             choice = menu_choice(
-                f"Student Menu - {user.full_name}",
+                f"Student Menu - {student_name}",
                 {
                     "1": "View profile",
                     "2": "View courses",
@@ -133,10 +133,10 @@ class DashboardView:
             pause()
 
     def _parent_menu(self, user: User) -> None:
-        student_id = self._linked_student_id(user)
+        student_id, student_name = self._select_student(user)
         while self.auth.is_logged_in():
             choice = menu_choice(
-                f"Parent Menu - {user.full_name}",
+                f"Parent Menu - {student_name}",
                 {
                     "1": "View student information",
                     "2": "View grades",
@@ -154,10 +154,17 @@ class DashboardView:
                 print("Invalid option.")
             pause()
 
-    def _linked_student_id(self, user: User) -> str:
-        if user.linked_student_id:
-            return user.linked_student_id
-        return prompt_required("Linked student ID").upper()
+    def _select_student(self, user: User) -> tuple[str, str]:
+        default_student_id = user.linked_student_id or None
+        while True:
+            student_id = prompt_required("Student ID", default_student_id).upper()
+            try:
+                student = self.students.controller.get_student(student_id)
+            except ValueError as exc:
+                print(f"Error: {exc}")
+                default_student_id = None
+                continue
+            return student.id, student.name
 
     def _global_search(self) -> None:
         keyword = prompt_required("Search keyword")

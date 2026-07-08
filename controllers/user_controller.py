@@ -24,6 +24,12 @@ class UserController:
     ) -> User:
         return self.service.create_user(username, password, role, full_name, linked_student_id)
 
+    @staticmethod
+    def _normalize_linked_student_id(student_id: Optional[str]) -> Optional[str]:
+        if student_id is None:
+            return None
+        return student_id.strip().upper() or None
+
     def update_user(
         self,
         user_id: int,
@@ -36,8 +42,11 @@ class UserController:
         assignments: list[str] = []
         params: list[SqlValue] = []
         if username is not None:
+            username = username.strip().lower()
+            if not username:
+                raise ValueError("Username is required.")
             assignments.append("username = ?")
-            params.append(username.strip())
+            params.append(username)
         if role is not None:
             role = role.strip().lower()
             if role not in ROLES:
@@ -45,11 +54,14 @@ class UserController:
             assignments.append("role = ?")
             params.append(role)
         if full_name is not None:
+            full_name = full_name.strip()
+            if not full_name:
+                raise ValueError("Full name is required.")
             assignments.append("full_name = ?")
-            params.append(full_name.strip())
+            params.append(full_name)
         if linked_student_id is not None:
             assignments.append("linked_student_id = ?")
-            params.append(linked_student_id.strip() or None)
+            params.append(self._normalize_linked_student_id(linked_student_id))
         if password:
             assignments.append("password_hash = ?")
             params.append(hash_password(password))

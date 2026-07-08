@@ -4,7 +4,27 @@ from controllers.course_controller import CourseController
 from controllers.department_controller import DepartmentController
 from controllers.teacher_controller import TeacherController
 from models.course import Course
-from views.menu import menu_choice, pause, print_table, prompt_int, prompt_optional, prompt_required, show_error, show_success, yes_no
+from views.menu import (
+    menu_choice,
+    pause,
+    print_table,
+    prompt_int,
+    prompt_optional,
+    prompt_required,
+    show_error,
+    show_success,
+    yes_no,
+)
+
+
+COURSE_TABLE_COLUMNS = [
+    ("id", "ID"),
+    ("code", "Code"),
+    ("name", "Name"),
+    ("department", "Department"),
+    ("teacher", "Teacher"),
+    ("credits", "Credits"),
+]
 
 
 class CourseView:
@@ -54,7 +74,7 @@ class CourseView:
             }
             for course in courses
         ]
-        print_table(rows, [("id", "ID"), ("code", "Code"), ("name", "Name"), ("department", "Department"), ("teacher", "Teacher"), ("credits", "Credits")])
+        print_table(rows, COURSE_TABLE_COLUMNS)
 
     def _department_id(self, default: int | None = None) -> int:
         print_table(
@@ -127,7 +147,8 @@ class CourseView:
             if course_id is None:
                 return
             course = self.controller.get_course(course_id)
-            if yes_no(f"Delete {course.label()}", default=False) and self.controller.delete_course(course_id):
+            if yes_no(f"Delete {course.label()}", default=False):
+                self.controller.delete_course(course_id)
                 show_success("Course deleted.")
         except Exception as exc:
             show_error(exc)

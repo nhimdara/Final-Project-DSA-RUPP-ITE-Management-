@@ -33,16 +33,31 @@ class StudentController:
         students = [Student.from_row(row) for row in fetch_all(f"{STUDENT_SELECT} ORDER BY s.id")]
         self._student_table = HashTable.from_items(students, key=lambda student: student.id)
 
+    @staticmethod
+    def _normalize_department_id(department_id: int | None) -> int | None:
+        if department_id is None:
+            return None
+        if department_id <= 0:
+            return None
+        return department_id
+
+    @staticmethod
+    def _validate_year(year: int) -> None:
+        if year < 1:
+            raise ValueError("Year must be greater than zero.")
+
     def add_student(self, student: Student) -> Student:
         student_id = student.id.strip().upper()
         if not student_id or not student.name.strip():
             raise ValueError("Student ID and name are required.")
+        self._validate_year(student.year)
         if self._student_table.contains(student_id):
             raise ValueError("Duplicate student ID found.")
         execute(
             """
             INSERT INTO students
-                (id, name, gender, date_of_birth, email, phone, address, department_id, year, parent_name, parent_phone)
+                (id, name, gender, date_of_birth, email, phone, address,
+                 department_id, year, parent_name, parent_phone)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
             (
@@ -53,7 +68,7 @@ class StudentController:
                 student.email.strip(),
                 student.phone.strip(),
                 student.address.strip(),
-                student.department_id,
+                self._normalize_department_id(student.department_id),
                 student.year,
                 student.parent_name.strip(),
                 student.parent_phone.strip(),
@@ -84,8 +99,10 @@ class StudentController:
         return [student for student in self.list_students() if keyword in student.searchable_text()]
 
     def update_student(self, student: Student) -> Student:
-        if not student.id.strip() or not student.name.strip():
+        student_id = student.id.strip().upper()
+        if not student_id or not student.name.strip():
             raise ValueError("Student ID and name are required.")
+        self._validate_year(student.year)
         execute(
             """
             UPDATE students
@@ -108,15 +125,15 @@ class StudentController:
                 student.email.strip(),
                 student.phone.strip(),
                 student.address.strip(),
-                student.department_id,
+                self._normalize_department_id(student.department_id),
                 student.year,
                 student.parent_name.strip(),
                 student.parent_phone.strip(),
-                student.id.strip().upper(),
+                student_id,
             ),
         )
         self.refresh_cache()
-        return self.get_student(student.id.strip().upper())
+        return self.get_student(student_id)
 
     def delete_student(self, student_id: str) -> bool:
         student_id = student_id.strip().upper()

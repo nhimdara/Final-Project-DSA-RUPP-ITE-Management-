@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import sys
 from getpass import getpass
 
 from controllers.auth_controller import AuthController
@@ -11,18 +12,27 @@ class LoginView:
     def __init__(self) -> None:
         self.auth = AuthController()
 
+    @staticmethod
+    def _read_password() -> str:
+        if not sys.stdin.isatty():
+            return input("Password: ")
+        try:
+            return getpass("Password: ")
+        except Exception:
+            return input("Password: ")
+
     def run(self) -> None:
         while True:
             title("Student Management System")
-            print("Default accounts: admin/admin123, teacher/teacher123, student/student123, parent/parent123")
+            print(
+                "Default accounts: admin/admin123, teacher/teacher123, "
+                "student/student123, parent/parent123"
+            )
             username = input("Username (or exit): ").strip()
             if username.lower() in {"exit", "quit", "0"}:
                 print("Goodbye.")
                 return
-            try:
-                password = getpass("Password: ")
-            except Exception:
-                password = input("Password: ")
+            password = self._read_password()
             user = self.auth.login(username, password)
             if user is None:
                 print("Invalid username or password.")

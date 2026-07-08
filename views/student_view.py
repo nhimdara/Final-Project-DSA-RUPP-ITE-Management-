@@ -16,6 +16,16 @@ from views.menu import (
 )
 
 
+STUDENT_TABLE_COLUMNS = [
+    ("id", "ID"),
+    ("name", "Name"),
+    ("department", "Department"),
+    ("year", "Year"),
+    ("phone", "Phone"),
+    ("parent", "Parent"),
+]
+
+
 class StudentView:
     def __init__(self) -> None:
         self.controller = StudentController()
@@ -65,7 +75,10 @@ class StudentView:
             id=student_id,
             name=prompt_required("Name", existing.name if existing else None),
             gender=prompt_optional("Gender", existing.gender if existing else ""),
-            date_of_birth=prompt_optional("Date of birth", existing.date_of_birth if existing else ""),
+            date_of_birth=prompt_optional(
+                "Date of birth",
+                existing.date_of_birth if existing else "",
+            ),
             email=prompt_optional("Email", existing.email if existing else ""),
             phone=prompt_optional("Phone", existing.phone if existing else ""),
             address=prompt_optional("Address", existing.address if existing else ""),
@@ -91,7 +104,7 @@ class StudentView:
             }
             for student in students
         ]
-        print_table(rows, [("id", "ID"), ("name", "Name"), ("department", "Department"), ("year", "Year"), ("phone", "Phone"), ("parent", "Parent")])
+        print_table(rows, STUDENT_TABLE_COLUMNS)
 
     def add_student(self) -> None:
         try:
@@ -119,7 +132,8 @@ class StudentView:
         try:
             student_id = prompt_required("Student ID").upper()
             student = self.controller.get_student(student_id)
-            if yes_no(f"Delete {student.name}", default=False) and self.controller.delete_student(student_id):
+            if yes_no(f"Delete {student.name}", default=False):
+                self.controller.delete_student(student_id)
                 show_success("Student deleted.")
         except Exception as exc:
             show_error(exc)

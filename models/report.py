@@ -36,7 +36,12 @@ class Report:
             lines.append(" | ".join(header.ljust(widths[header]) for header in headers))
             lines.append("-+-".join("-" * widths[header] for header in headers))
             for row in self.rows:
-                lines.append(" | ".join(str(row.get(header, "")).ljust(widths[header]) for header in headers))
+                lines.append(
+                    " | ".join(
+                        str(row.get(header, "")).ljust(widths[header])
+                        for header in headers
+                    )
+                )
         else:
             lines.append("No rows.")
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from database.db import execute, fetch_all, fetch_one
+from database.db import execute, execute_insert, fetch_all, fetch_one
 from models.teacher import Teacher
 
 
@@ -19,6 +19,14 @@ LEFT JOIN departments d ON d.id = t.department_id
 
 
 class TeacherController:
+    @staticmethod
+    def _normalize_optional_id(value: int | None) -> int | None:
+        if value is None:
+            return None
+        if value <= 0:
+            return None
+        return value
+
     def add_teacher(
         self,
         name: str,
@@ -27,14 +35,21 @@ class TeacherController:
         department_id: int | None = None,
         user_id: int | None = None,
     ) -> Teacher:
-        if not name.strip():
+        name = name.strip()
+        if not name:
             raise ValueError("Teacher name is required.")
-        teacher_id = execute(
+        teacher_id = execute_insert(
             """
             INSERT INTO teachers (name, email, phone, department_id, user_id)
             VALUES (?, ?, ?, ?, ?)
             """,
-            (name.strip(), email.strip() or None, phone.strip(), department_id, user_id),
+            (
+                name,
+                email.strip() or None,
+                phone.strip(),
+                self._normalize_optional_id(department_id),
+                self._normalize_optional_id(user_id),
+            ),
         )
         return self.get_teacher(teacher_id)
 
@@ -57,7 +72,8 @@ class TeacherController:
         department_id: int | None = None,
         user_id: int | None = None,
     ) -> Teacher:
-        if not name.strip():
+        name = name.strip()
+        if not name:
             raise ValueError("Teacher name is required.")
         execute(
             """
@@ -65,7 +81,14 @@ class TeacherController:
             SET name = ?, email = ?, phone = ?, department_id = ?, user_id = ?
             WHERE id = ?
             """,
-            (name.strip(), email.strip() or None, phone.strip(), department_id, user_id, teacher_id),
+            (
+                name,
+                email.strip() or None,
+                phone.strip(),
+                self._normalize_optional_id(department_id),
+                self._normalize_optional_id(user_id),
+                teacher_id,
+            ),
         )
         return self.get_teacher(teacher_id)
 

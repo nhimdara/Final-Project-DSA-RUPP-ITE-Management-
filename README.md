@@ -11,6 +11,7 @@ Console-based Student Management System built from the included diagrams.
 - Academic relationship graph support for university, departments, courses, and students
 - Performance summaries and text report generation
 - SQLite persistence in `database/student_management.db`
+- Optional XAMPP/MySQL persistence through PyMySQL
 
 ## Run
 
@@ -34,3 +35,26 @@ Default demo accounts:
 | Parent | `parent` | `parent123` |
 
 Generated reports are saved in `reports/generated`.
+
+## Run With XAMPP MySQL
+
+Start MySQL in XAMPP, then install the MySQL driver:
+
+```powershell
+uv pip install -r requirements.txt
+```
+
+Use these environment variables before running the app:
+
+```powershell
+$env:SMS_DB_DRIVER="mysql"
+$env:SMS_DB_HOST="127.0.0.1"
+$env:SMS_DB_PORT="3306"
+$env:SMS_DB_USER="root"
+$env:SMS_DB_PASSWORD=""
+$env:SMS_DB_NAME="student_management"
+python main.py
+```
+
+The app creates the database and tables automatically. You can also import
+`database/schema_mysql.sql` in phpMyAdmin if you want to create the tables manually.
