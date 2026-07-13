@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from database.db import execute, fetch_all, fetch_one
+from database.queries import execute, fetch_all, fetch_one
 from data_structures.hash_table import HashTable
 from models.student import Student
 

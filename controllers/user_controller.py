@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from database.db import SqlValue, execute, fetch_one
+from database.queries import SqlValue, execute, fetch_one
 from models.user import ROLES, User, hash_password
 from services.authentication_service import AuthenticationService
 

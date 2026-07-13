@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from database.db import execute, execute_insert, fetch_all, fetch_one
+from database.queries import execute, execute_insert, fetch_all, fetch_one
 from models.department import Department
 
 

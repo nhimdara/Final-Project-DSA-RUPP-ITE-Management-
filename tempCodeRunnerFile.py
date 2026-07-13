@@ -1,0 +1,1 @@
+from database.initializer import initialize_database

@@ -10,8 +10,46 @@ Console-based Student Management System built from the included diagrams.
 - Fast student lookup through a hash table cache
 - Academic relationship graph support for university, departments, courses, and students
 - Performance summaries and text report generation
-- SQLite persistence in `database/student_management.db`
-- Optional XAMPP/MySQL persistence through PyMySQL
+- MySQL persistence through PyMySQL, compatible with MySQL Workbench
+
+## MySQL Workbench Setup
+
+MySQL Workbench is the graphical client; the application connects to the
+MySQL Server used by Workbench. Start MySQL Server, then install the driver:
+
+```powershell
+py -m pip install -r requirements.txt
+```
+
+The application uses these defaults:
+
+| Setting | Default |
+| --- | --- |
+| Host | `127.0.0.1` |
+| Port | `3306` |
+| User | `root` |
+| Password | empty |
+| Database | `student_management` |
+
+If your Workbench connection uses a password or different settings, set them
+in the same PowerShell window before starting the application:
+
+```powershell
+$env:SMS_DB_HOST="127.0.0.1"
+$env:SMS_DB_PORT="3306"
+$env:SMS_DB_USER="root"
+$env:SMS_DB_PASSWORD="your_mysql_password"
+$env:SMS_DB_NAME="student_management"
+```
+
+Do not save a real database password in the source code. On first startup, the
+application creates the database and tables from `database/schema_mysql.sql`
+and inserts the demo records. Refresh the Schemas panel in Workbench to see
+the `student_management` database.
+
+For a manual Workbench setup, open and execute
+`database/student_management_workbench.sql`. This standalone script creates
+the database, tables, and demo records.
 
 ## Run
 
@@ -19,10 +57,10 @@ Console-based Student Management System built from the included diagrams.
 python main.py
 ```
 
-If `python` opens the Windows Store shortcut, use:
+If `python` opens the Windows Store shortcut, use the Windows Python launcher:
 
 ```powershell
-uv run python main.py
+py -3 main.py
 ```
 
 Default demo accounts:
@@ -35,26 +73,3 @@ Default demo accounts:
 | Parent | `parent` | `parent123` |
 
 Generated reports are saved in `reports/generated`.
-
-## Run With XAMPP MySQL
-
-Start MySQL in XAMPP, then install the MySQL driver:
-
-```powershell
-uv pip install -r requirements.txt
-```
-
-Use these environment variables before running the app:
-
-```powershell
-$env:SMS_DB_DRIVER="mysql"
-$env:SMS_DB_HOST="127.0.0.1"
-$env:SMS_DB_PORT="3306"
-$env:SMS_DB_USER="root"
-$env:SMS_DB_PASSWORD=""
-$env:SMS_DB_NAME="student_management"
-python main.py
-```
-
-The app creates the database and tables automatically. You can also import
-`database/schema_mysql.sql` in phpMyAdmin if you want to create the tables manually.

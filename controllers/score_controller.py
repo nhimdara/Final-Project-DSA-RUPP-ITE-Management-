@@ -5,7 +5,7 @@ from math import isfinite
 from statistics import mean
 from typing import Optional, TypedDict
 
-from database.db import execute, fetch_all, fetch_one, is_mysql_backend
+from database.queries import execute, fetch_all, fetch_one
 from data_structures.tree import GradeDecisionTree
 from models.score import Score
 
@@ -74,35 +74,19 @@ class ScoreController:
             academic_year,
             recorded_by,
         )
-        if is_mysql_backend():
-            execute(
-                """
-                INSERT INTO scores
-                    (student_id, course_id, score, grade, semester, academic_year, recorded_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                ON DUPLICATE KEY UPDATE
-                    score = VALUES(score),
-                    grade = VALUES(grade),
-                    recorded_by = VALUES(recorded_by),
-                    recorded_at = CURRENT_TIMESTAMP
-                """,
-                params,
-            )
-        else:
-            execute(
-                """
-                INSERT INTO scores
-                    (student_id, course_id, score, grade, semester, academic_year, recorded_by)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
-                ON CONFLICT(student_id, course_id, semester, academic_year)
-                DO UPDATE SET
-                    score = excluded.score,
-                    grade = excluded.grade,
-                    recorded_by = excluded.recorded_by,
-                    recorded_at = CURRENT_TIMESTAMP
-                """,
-                params,
-            )
+        execute(
+            """
+            INSERT INTO scores
+                (student_id, course_id, score, grade, semester, academic_year, recorded_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ON DUPLICATE KEY UPDATE
+                score = VALUES(score),
+                grade = VALUES(grade),
+                recorded_by = VALUES(recorded_by),
+                recorded_at = CURRENT_TIMESTAMP
+            """,
+            params,
+        )
         return self.get_score(student_id, course_id, semester, academic_year)
 
     def get_score(

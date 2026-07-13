@@ -1,8 +1,5 @@
 from __future__ import annotations
 
-import sys
-from getpass import getpass
-
 from controllers.auth_controller import AuthController
 from views.dashboard_view import DashboardView
 from views.menu import title
@@ -14,12 +11,7 @@ class LoginView:
 
     @staticmethod
     def _read_password() -> str:
-        if not sys.stdin.isatty():
-            return input("Password: ")
-        try:
-            return getpass("Password: ")
-        except Exception:
-            return input("Password: ")
+        return input("Password: ")
 
     def run(self) -> None:
         while True:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from database.db import execute, execute_insert, fetch_all, fetch_one
+from database.queries import execute, execute_insert, fetch_all, fetch_one
 from models.user import ROLES, User, hash_password, verify_password
 
 

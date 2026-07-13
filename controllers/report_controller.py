@@ -5,7 +5,7 @@ from controllers.department_controller import DepartmentController
 from controllers.performance_controller import PerformanceController
 from controllers.score_controller import ScoreController
 from controllers.student_controller import StudentController
-from database.db import execute
+from database.queries import execute
 from data_structures.graph import build_academic_graph
 from models.report import Report
 from reports.report_generator import ReportGenerator

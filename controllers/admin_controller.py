@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from database.db import fetch_one
+from database.queries import fetch_one
 
 
 class AdminController:

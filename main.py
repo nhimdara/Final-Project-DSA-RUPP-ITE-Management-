@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from database.db import initialize_database
+from database.initializer import initialize_database
 from views.login_view import LoginView
 
 

@@ -36,9 +36,11 @@ StudentManagementSystem/
 |-- database/
 |   |-- __init__.py
 |   |-- db.py
-|   |-- schema.sql
+|   |-- initializer.py
+|   |-- queries.py
 |   |-- schema_mysql.sql
-|   `-- student_management.db
+|   |-- student_management_workbench.sql
+|   `-- seed.py
 |
 |-- models/
 |   |-- __init__.py
@@ -79,7 +81,12 @@ StudentManagementSystem/
 - `assets/` stores project diagrams and other static resources.
 - `controllers/` handles application actions and coordinates models with views.
 - `data_structures/` contains the graph, hash table, and tree implementations used by the project.
-- `database/` contains database connections, schemas, and the SQLite database file.
+- `database/db.py` contains only MySQL connection configuration and management.
+- `database/queries.py` contains reusable query helpers.
+- `database/initializer.py` creates the database and loads the schema.
+- `database/seed.py` inserts the initial demonstration records.
+- `database/student_management_workbench.sql` is a standalone Workbench import
+  containing the database, tables, and demonstration records.
 - `models/` defines the application's data entities and row mappings.
 - `reports/` contains report generation logic.
 - `services/` contains shared business services such as authentication.

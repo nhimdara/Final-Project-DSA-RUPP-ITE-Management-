@@ -4,8 +4,8 @@
     {
       "label": "Run Student Management System",
       "type": "shell",
-      "command": "uv",
-      "args": ["run", "python", "main.py"],
+      "command": "py",
+      "args": ["-3", "main.py"],
       "group": {
         "kind": "build",
         "isDefault": true

@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import TypedDict
 
 from controllers.score_controller import ScoreController, StudentPerformance
-from database.db import fetch_all
+from database.queries import fetch_all
 from data_structures.tree import GradeDecisionTree
 
 
