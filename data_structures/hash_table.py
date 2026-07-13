@@ -27,6 +27,17 @@ class HashTable(Generic[K, V]):
     def get(self, key: K, default: Optional[V] = None) -> Optional[V]:
         return self._items.get(key, default)
 
+    def search(self, key: K) -> Optional[V]:
+        """Search for and return a value by its key."""
+        return self._items.get(key)
+
+    def update(self, key: K, value: V) -> bool:
+        """Update an existing value. Return False when the key is missing."""
+        if key not in self._items:
+            return False
+        self._items[key] = value
+        return True
+
     def delete(self, key: K) -> bool:
         if key not in self._items:
             return False
@@ -41,6 +52,10 @@ class HashTable(Generic[K, V]):
 
     def items(self) -> list[tuple[K, V]]:
         return list(self._items.items())
+
+    def display(self) -> list[tuple[K, V]]:
+        """Return all key-value pairs for display by the console program."""
+        return self.items()
 
     def clear(self) -> None:
         self._items.clear()

@@ -1,94 +1,24 @@
-# Student Management System Structure
+# Project Structure
 
 ```text
 StudentManagementSystem/
+|-- data.py
 |-- main.py
 |-- README.md
-|-- requirements.txt
-|-- STRUCTURE.md
-|
-|-- assets/
-|   `-- diagrams/
-|       |-- flowchart.png
-|       |-- system_diagram.png
-|       `-- usecase.png
-|
-|-- controllers/
-|   |-- __init__.py
-|   |-- admin_controller.py
-|   |-- auth_controller.py
-|   |-- course_controller.py
-|   |-- department_controller.py
-|   |-- performance_controller.py
-|   |-- report_controller.py
-|   |-- score_controller.py
-|   |-- search_controller.py
-|   |-- student_controller.py
-|   |-- teacher_controller.py
-|   `-- user_controller.py
-|
-|-- data_structures/
-|   |-- __init__.py
-|   |-- graph.py
-|   |-- hash_table.py
-|   `-- tree.py
-|
-|-- database/
-|   |-- __init__.py
-|   |-- db.py
-|   |-- initializer.py
-|   |-- queries.py
-|   |-- schema_mysql.sql
-|   |-- student_management_workbench.sql
-|   `-- seed.py
-|
-|-- models/
-|   |-- __init__.py
-|   |-- admin.py
-|   |-- course.py
-|   |-- department.py
-|   |-- report.py
-|   |-- row_mapping.py
-|   |-- score.py
-|   |-- student.py
-|   |-- teacher.py
-|   `-- user.py
-|
-|-- reports/
-|   |-- __init__.py
-|   `-- report_generator.py
-|
-|-- services/
-|   |-- __init__.py
-|   `-- authentication_service.py
-|
-`-- views/
+`-- data_structures/
     |-- __init__.py
-    |-- admin_view.py
-    |-- course_view.py
-    |-- dashboard_view.py
-    |-- department_view.py
-    |-- login_view.py
-    |-- menu.py
-    |-- performance_view.py
-    |-- report_view.py
-    |-- student_view.py
-    `-- teacher_view.py
+    |-- graph.py
+    |-- hash_table.py
+    |-- student_management.py
+    `-- tree.py
 ```
 
-## Directory Roles
+- `main.py` contains only the simple console menu.
+- `data.py` contains the initial users, students, courses, enrollments, and scores.
+- `student_management.py` contains student/course records and all operations.
+- `hash_table.py` stores students and courses.
+- `graph.py` stores student-course enrollment relationships.
+- `tree.py` calculates GPA values from scores.
 
-- `assets/` stores project diagrams and other static resources.
-- `controllers/` handles application actions and coordinates models with views.
-- `data_structures/` contains the graph, hash table, and tree implementations used by the project.
-- `database/db.py` contains only MySQL connection configuration and management.
-- `database/queries.py` contains reusable query helpers.
-- `database/initializer.py` creates the database and loads the schema.
-- `database/seed.py` inserts the initial demonstration records.
-- `database/student_management_workbench.sql` is a standalone Workbench import
-  containing the database, tables, and demonstration records.
-- `models/` defines the application's data entities and row mappings.
-- `reports/` contains report generation logic.
-- `services/` contains shared business services such as authentication.
-- `views/` contains the user-interface screens and menus.
-- `main.py` is the application entry point.
+The application uses data structures directly. It has no MVC layers and no
+database dependency.

@@ -1,69 +1,32 @@
-# Student Management System
+# Simple Student Management System
 
-Console-based Student Management System built from the included diagrams.
+A small console project that uses data structures directly. It does not use
+MVC, a database, or third-party packages.
+
+## Data structures
+
+- `HashTable` stores students and courses and provides fast ID/code lookup.
+- `Graph` connects students to the courses in which they are enrolled.
+- `GradeDecisionTree` converts numeric scores into GPA values.
 
 ## Features
 
-- Login and logout for administrator, teacher, student, and parent roles
-- Student, course, department, teacher, and user management
-- Score input with grade calculation through a decision tree
-- Fast student lookup through a hash table cache
-- Academic relationship graph support for university, departments, courses, and students
-- Performance summaries and text report generation
-- MySQL persistence through PyMySQL, compatible with MySQL Workbench
+- Login with administrator, teacher, student, and parent roles
+- Insert, delete, search, update, and display students
+- Insert, delete, search, update, and display courses
+- Enroll a student in a course
+- Record scores and calculate GPA on a 4.0 scale
+- Print a student's course report
+- Let students view their enrolled courses and credit-weighted GPA
+- Let teachers select a course and input scores for its enrolled students
+- Ask student and parent users for a valid student ID before displaying records
+- Let student and parent accounts view student information and GPA separately
 
-## MySQL Workbench Setup
+Data is kept in memory, so it resets when the program exits.
+Initial users, students, courses, enrollments, and scores are stored in
+`data.py`. Edit that file to change the data loaded at startup.
 
-MySQL Workbench is the graphical client; the application connects to the
-MySQL Server used by Workbench. Start MySQL Server, then install the driver:
-
-```powershell
-py -m pip install -r requirements.txt
-```
-
-The application uses these defaults:
-
-| Setting | Default |
-| --- | --- |
-| Host | `127.0.0.1` |
-| Port | `3306` |
-| User | `root` |
-| Password | empty |
-| Database | `student_management` |
-
-If your Workbench connection uses a password or different settings, set them
-in the same PowerShell window before starting the application:
-
-```powershell
-$env:SMS_DB_HOST="127.0.0.1"
-$env:SMS_DB_PORT="3306"
-$env:SMS_DB_USER="root"
-$env:SMS_DB_PASSWORD="your_mysql_password"
-$env:SMS_DB_NAME="student_management"
-```
-
-Do not save a real database password in the source code. On first startup, the
-application creates the database and tables from `database/schema_mysql.sql`
-and inserts the demo records. Refresh the Schemas panel in Workbench to see
-the `student_management` database.
-
-For a manual Workbench setup, open and execute
-`database/student_management_workbench.sql`. This standalone script creates
-the database, tables, and demo records.
-
-## Run
-
-```powershell
-python main.py
-```
-
-If `python` opens the Windows Store shortcut, use the Windows Python launcher:
-
-```powershell
-py -3 main.py
-```
-
-Default demo accounts:
+## Demo accounts
 
 | Role | Username | Password |
 | --- | --- | --- |
@@ -72,4 +35,14 @@ Default demo accounts:
 | Student | `student` | `student123` |
 | Parent | `parent` | `parent123` |
 
-Generated reports are saved in `reports/generated`.
+The generic student and parent accounts ask for a student ID after login. Use
+`S001` or `S002` with the initial data. Courses `CS101` and `MATH101`,
+enrollments, and example scores are included so every menu can be tested.
+
+## Run
+
+```powershell
+python main.py
+```
+
+The program only needs Python 3.9 or newer.
