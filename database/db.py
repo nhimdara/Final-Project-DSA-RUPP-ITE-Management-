@@ -7,9 +7,9 @@ from typing import Any, Iterator, TypeAlias
 
 
 MYSQL_HOST = os.getenv("SMS_DB_HOST", "127.0.0.1")
-MYSQL_PORT = int(os.getenv("SMS_DB_PORT", "3307"))
+MYSQL_PORT = int(os.getenv("SMS_DB_PORT", "3306"))
 MYSQL_USER = os.getenv("SMS_DB_USER", "root")
-MYSQL_PASSWORD = os.getenv("SMS_DB_PASSWORD", "")
+MYSQL_PASSWORD = os.getenv("SMS_DB_PASSWORD", "saiyeen31")
 MYSQL_DATABASE = os.getenv("SMS_DB_NAME", "student_management")
 DbConnection: TypeAlias = Any
 
