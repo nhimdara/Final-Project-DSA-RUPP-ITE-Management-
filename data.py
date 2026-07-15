@@ -47,6 +47,12 @@ STUDENTS = (
         "department": "Information Technology",
         "year": 2,
     },
+    {
+        "student_id": "S003",
+        "name": "Jamie Lee",
+        "department": "Software Engineering",
+        "year": 3,
+    }
 )
 
 COURSES = (
