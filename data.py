@@ -53,7 +53,7 @@ COURSES = (
     {"code": "CS101", "name": "Data Structures", "credits": 3},
     {"code": "MATH101", "name": "Discrete Mathematics", "credits": 3},
 )
-jj
+
 ENROLLMENTS = (
     {"student_id": "S001", "course_code": "CS101"},
     {"student_id": "S001", "course_code": "MATH101"},
