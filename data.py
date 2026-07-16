@@ -1,7 +1,6 @@
-"""Initial data loaded by the Student Management System.
+"""Persistent data for the Student Management System.
 
-Edit these collections to change the records available whenever the program
-starts. Changes made through the console are kept in memory only.
+This file is updated automatically when records change through the console.
 """
 
 from __future__ import annotations
@@ -15,9 +14,9 @@ USERS = (
         "student_id": "",
     },
     {
-        "username": "teacher",
-        "password": "teacher123",
-        "role": "teacher",
+        "username": "parent",
+        "password": "parent123",
+        "role": "parent",
         "student_id": "",
     },
     {
@@ -27,9 +26,9 @@ USERS = (
         "student_id": "",
     },
     {
-        "username": "parent",
-        "password": "parent123",
-        "role": "parent",
+        "username": "teacher",
+        "password": "teacher123",
+        "role": "teacher",
         "student_id": "",
     },
 )
@@ -52,7 +51,8 @@ STUDENTS = (
         "name": "Jamie Lee",
         "department": "Software Engineering",
         "year": 3,
-    }
+    },
+    {"student_id": "S005", "name": "dara", "department": "ITE", "year": 2},
 )
 
 COURSES = (
