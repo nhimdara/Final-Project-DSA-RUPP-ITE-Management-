@@ -52,6 +52,9 @@ STUDENTS = (
 COURSES = (
     {"code": "CS101", "name": "Data Structures", "credits": 3},
     {"code": "MATH101", "name": "Discrete Mathematics", "credits": 3},
+    {"code": "ENG01", "name": "English", "credits": 2},
+    {"code": "DB101", "name": "Database", "credits":3},
+    {"code": "APL101", "name": "Application Programing", "credit": 4}
 )
 
 ENROLLMENTS = (
