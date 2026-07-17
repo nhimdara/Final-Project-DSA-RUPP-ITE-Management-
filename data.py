@@ -36,15 +36,93 @@ USERS = (
 
 STUDENTS = (
     {
-        "student_id": "S001",
-        "name": "Demo Student",
+        "student_id": "e20230001",
+        "name": "Chan Mean",
+        "department": "Information Technology",
+        "year": 2,
+    },
+    {
+        "student_id": "e20230042",
+        "name": "Sok Dara",
+        "department": "Information Technology",
+        "year": 2,
+    },
+    {
+        "student_id": "e20230115",
+        "name": "Keo Rotha",
+        "department": "Computer Science",
+        "year": 2,
+    },
+    {
+        "student_id": "e20230089",
+        "name": "Chea Boring",
+        "department": "Information Technology",
+        "year": 2,
+    },
+    {
+        "student_id": "e20230210",
+        "name": "Nguon Sovann",
+        "department": "Computer Science",
+        "year": 2,
+    },
+    {
+        "student_id": "e20220015",
+        "name": "Lim Heng",
+        "department": "Information Technology",
+        "year": 3,
+    },
+    {
+        "student_id": "e20220102",
+        "name": "Vann Chanthou",
+        "department": "Computer Science",
+        "year": 3,
+    },
+    {
+        "student_id": "e20220188",
+        "name": "Te Tepnorin",
+        "department": "Information Technology",
+        "year": 3,
+    },
+    {
+        "student_id": "e20240022",
+        "name": "San Sreypich",
+        "department": "Information Technology",
+        "year": 1,
+    },
+    {
+        "student_id": "e20240075",
+        "name": "Bun Tharith",
         "department": "Computer Science",
         "year": 1,
     },
     {
-        "student_id": "S002",
-        "name": "Alex Morgan",
+        "student_id": "e20210055",
+        "name": "Ouk Kalyan",
+        "department": "Computer Science",
+        "year": 4,
+    },
+    {
+        "student_id": "e20210120",
+        "name": "Meas Samnang",
         "department": "Information Technology",
+        "year": 4,
+    },
+    {
+        "student_id": "e20230301",
+        "name": "Phon Makara",
+        "department": "Telecommunication Engineering",
+        "year": 2,
+    },
+    {
+        "student_id": "e20230144",
+        "name": "Seng Sreyneath",
+        "department": "Information Technology",
+        "year": 2,
+    },
+    {
+        "student_id": "e20230095",
+        "name": "Khim Visal",
+        "department": "Computer Science",
         "year": 2,
     },
 )
