@@ -124,21 +124,14 @@ STUDENTS = (
         "department": "Computer Science",
         "year": 2,
     },
-    {
-        "student_id": "S003",
-        "name": "Jamie Lee",
-        "department": "Software Engineering",
-        "year": 3,
-    },
-    {"student_id": "S005", "name": "dara", "department": "ITE", "year": 2},
 )
 
 COURSES = (
     {"code": "CS101", "name": "Data Structures", "credits": 3},
     {"code": "MATH101", "name": "Discrete Mathematics", "credits": 3},
     {"code": "ENG01", "name": "English", "credits": 2},
-    {"code": "DB101", "name": "Database", "credits":3},
-    {"code": "APL101", "name": "Application Programing", "credit": 4}
+    {"code": "DB101", "name": "Database", "credits": 3},
+    {"code": "APL101", "name": "Application Programing", "credits": 4},
 )
 
 ENROLLMENTS = (
