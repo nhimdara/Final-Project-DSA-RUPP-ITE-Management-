@@ -1,179 +1,186 @@
-"""Combined data structures and operations for student management.
+"""Student Management System - core data structures.
 
-This module keeps the complete implementation in one place: hash tables store
-records, a graph stores enrollment relationships, and a decision tree converts
-scores into grades and GPA values.
+This file re-implements the three data structures from your Data Structures
+course using the classic textbook approach, instead of relying on Python's
+built-in dict/set shortcuts:
+
+    1. Hash Table  -> array of buckets + chaining (separate chaining)
+    2. Graph       -> adjacency list (dictionary of lists)
+    3. Decision Tree -> binary tree of nodes, walked recursively
+
+Plain classes (no dataclasses, no typing generics) are used throughout so the
+code reads the same way it would in a lesson or a textbook.
 """
 
-from __future__ import annotations
-
 from collections import deque
-from collections.abc import Callable, Iterable, Iterator
-from dataclasses import dataclass, field
 from pathlib import Path
 from pprint import pformat
-from typing import Generic, Optional, TypeVar
 
 from data import COURSES, ENROLLMENTS, SCORES, STUDENTS, USERS
 
 
 # ---------------------------------------------------------------------------
-# Generic hash table
+# 1. HASH TABLE  (separate chaining)
 # ---------------------------------------------------------------------------
-# K is the key type (for example, str) and V is the stored record type.
-K = TypeVar("K")
-V = TypeVar("V")
+# A hash table stores (key, value) pairs. Instead of computing an index and
+# putting ONE item there, we put a small LIST ("bucket") at every index.
+# If two keys hash to the same index (a "collision"), they simply live in the
+# same bucket's list. This is the "separate chaining" method taught in class.
 
 
-class HashTable(Generic[K, V]):
-    """Store records by key for fast insert, search, update, and delete."""
+class HashTable:
+    """A hash table with a fixed number of buckets and chaining."""
 
-    def __init__(self) -> None:
-        """Create an empty table backed by Python's dictionary."""
-        self._items: dict[K, V] = {}
+    def __init__(self, capacity=101):
+        # capacity = number of buckets. A prime number spreads keys out more
+        # evenly, which is why 101 (instead of 100) is used here.
+        self.capacity = capacity
+        # Each bucket starts as an empty list that will hold [key, value] pairs.
+        self.buckets = [[] for _ in range(self.capacity)]
+        self.size = 0  # how many items are currently stored
 
-    @classmethod
-    def from_items(
-        cls, items: Iterable[V], key: Callable[[V], K]
-    ) -> "HashTable[K, V]":
-        """Build a table from values using ``key`` to identify each value."""
-        table: HashTable[K, V] = cls()
-        for item in items:
-            table.insert(key(item), item)
-        return table
+    def _hash(self, key):
+        """Turn a key into a bucket index between 0 and capacity - 1."""
+        # Python's built-in hash() works for any hashable key (strings, etc).
+        # We only care about a non-negative index, so we take it mod capacity.
+        return hash(key) % self.capacity
 
-    def insert(self, key: K, value: V) -> None:
-        """Insert a value, replacing the old value if the key already exists."""
-        self._items[key] = value
+    def insert(self, key, value):
+        """Insert a (key, value) pair, or overwrite the value if key exists."""
+        index = self._hash(key)
+        bucket = self.buckets[index]
+        for pair in bucket:
+            if pair[0] == key:
+                pair[1] = value  # key already there -> just update it
+                return
+        bucket.append([key, value])
+        self.size += 1
 
-    def get(self, key: K, default: Optional[V] = None) -> Optional[V]:
-        """Return a value or ``default`` when the key is absent."""
-        return self._items.get(key, default)
+    def search(self, key):
+        """Return the value stored for key, or None if it is not present."""
+        index = self._hash(key)
+        bucket = self.buckets[index]
+        for stored_key, stored_value in bucket:
+            if stored_key == key:
+                return stored_value
+        return None
 
-    def search(self, key: K) -> Optional[V]:
-        """Return the value for a key, or ``None`` when it is absent."""
-        return self._items.get(key)
+    def get(self, key, default=None):
+        """Same as search(), but lets you choose the value returned if missing."""
+        value = self.search(key)
+        return default if value is None else value
 
-    def update(self, key: K, value: V) -> bool:
-        """Replace an existing value and report whether the key was found."""
-        if key not in self._items:
-            return False
-        self._items[key] = value
-        return True
+    def update(self, key, value):
+        """Replace an existing value. Returns True if key was found."""
+        index = self._hash(key)
+        bucket = self.buckets[index]
+        for pair in bucket:
+            if pair[0] == key:
+                pair[1] = value
+                return True
+        return False
 
-    def delete(self, key: K) -> bool:
-        """Delete a value and report whether the key was found."""
-        if key not in self._items:
-            return False
-        del self._items[key]
-        return True
+    def delete(self, key):
+        """Remove a key from the table. Returns True if key was found."""
+        index = self._hash(key)
+        bucket = self.buckets[index]
+        for i, pair in enumerate(bucket):
+            if pair[0] == key:
+                bucket.pop(i)
+                self.size -= 1
+                return True
+        return False
 
-    def contains(self, key: K) -> bool:
-        """Return whether the table contains ``key``."""
-        return key in self._items
+    def contains(self, key):
+        """Return True if key exists in the table."""
+        return self.search(key) is not None
 
-    def values(self) -> list[V]:
-        """Return a snapshot of all stored values."""
-        return list(self._items.values())
+    def keys(self):
+        """Return a list of every key currently stored."""
+        result = []
+        for bucket in self.buckets:
+            for key, _value in bucket:
+                result.append(key)
+        return result
 
-    def items(self) -> list[tuple[K, V]]:
-        """Return a snapshot of all key-value pairs."""
-        return list(self._items.items())
+    def values(self):
+        """Return a list of every value currently stored."""
+        result = []
+        for bucket in self.buckets:
+            for _key, value in bucket:
+                result.append(value)
+        return result
 
-    def display(self) -> list[tuple[K, V]]:
-        """Return table contents in a form suitable for the console UI."""
-        return self.items()
+    def items(self):
+        """Return a list of (key, value) tuples for every stored pair."""
+        result = []
+        for bucket in self.buckets:
+            for key, value in bucket:
+                result.append((key, value))
+        return result
 
-    def clear(self) -> None:
-        """Remove every value from the table."""
-        self._items.clear()
-
-    def __len__(self) -> int:
-        """Return the number of stored values."""
-        return len(self._items)
-
-    def __iter__(self) -> Iterator[K]:
-        """Iterate over keys, matching normal dictionary behavior."""
-        return iter(self._items)
+    def __len__(self):
+        return self.size
 
 
 # ---------------------------------------------------------------------------
-# Enrollment graph
+# 2. GRAPH  (adjacency list, undirected)
 # ---------------------------------------------------------------------------
+# The graph connects students to the courses they are enrolled in. Each
+# vertex (student or course) keeps a plain LIST of its neighbors. Because the
+# graph is undirected, adding an edge A-B adds B to A's list AND A to B's list.
+
+
 class Graph:
-    """Undirected graph connecting students to their enrolled courses.
+    """Undirected graph stored as an adjacency list (dict of lists)."""
 
-    Every adjacency set stores both sides of an edge. For example, adding an
-    S001-CS101 enrollment makes the course a neighbor of the student and the
-    student a neighbor of the course.
-    """
+    def __init__(self):
+        self.adjacency = {}  # vertex -> list of neighboring vertices
 
-    def __init__(self) -> None:
-        """Create an empty adjacency-list graph."""
-        self.adjacency: dict[str, set[str]] = {}
+    def add_vertex(self, vertex):
+        """Add a vertex with no edges yet, if it doesn't already exist."""
+        if vertex not in self.adjacency:
+            self.adjacency[vertex] = []
 
-    def add_vertex(self, vertex: str) -> None:
-        """Add a vertex without changing it when it already exists."""
-        self.adjacency.setdefault(vertex, set())
-
-    def insert(self, vertex: str) -> None:
-        """Alias used by the management system when inserting records."""
-        self.add_vertex(vertex)
-
-    def add_edge(self, first: str, second: str) -> None:
-        """Connect two vertices and create missing vertices automatically."""
+    def add_edge(self, first, second):
+        """Connect two vertices, creating them first if needed."""
         self.add_vertex(first)
         self.add_vertex(second)
-        self.adjacency[first].add(second)
-        self.adjacency[second].add(first)
+        if second not in self.adjacency[first]:
+            self.adjacency[first].append(second)
+        if first not in self.adjacency[second]:
+            self.adjacency[second].append(first)
 
-    def has_edge(self, first: str, second: str) -> bool:
-        """Return whether two vertices are directly connected."""
-        return second in self.adjacency.get(first, set())
+    def has_edge(self, first, second):
+        """Return True if first and second are directly connected."""
+        return second in self.adjacency.get(first, [])
 
-    def remove_edge(self, first: str, second: str) -> None:
-        """Remove both directions of an edge; missing vertices are harmless."""
-        self.adjacency.get(first, set()).discard(second)
-        self.adjacency.get(second, set()).discard(first)
+    def remove_edge(self, first, second):
+        """Disconnect two vertices, if the edge exists."""
+        if first in self.adjacency and second in self.adjacency[first]:
+            self.adjacency[first].remove(second)
+        if second in self.adjacency and first in self.adjacency[second]:
+            self.adjacency[second].remove(first)
 
-    def remove_vertex(self, vertex: str) -> bool:
-        """Remove a vertex and every edge that points to it."""
+    def remove_vertex(self, vertex):
+        """Remove a vertex and every edge pointing to it. Returns True if found."""
         if vertex not in self.adjacency:
             return False
-        for neighbor in self.adjacency.pop(vertex, set()):
-            self.adjacency[neighbor].discard(vertex)
+        for neighbor in self.adjacency.pop(vertex):
+            self.adjacency[neighbor].remove(vertex)
         return True
 
-    def delete(self, vertex: str) -> bool:
-        """Alias for ``remove_vertex`` used by CRUD operations."""
-        return self.remove_vertex(vertex)
+    def neighbors(self, vertex):
+        """Return the sorted list of vertices directly connected to vertex."""
+        return sorted(self.adjacency.get(vertex, []))
 
-    def search(self, vertex: str) -> bool:
-        """Return whether a vertex exists."""
-        return vertex in self.adjacency
-
-    def update(self, old_vertex: str, new_vertex: str) -> bool:
-        """Rename a vertex while preserving all its edges."""
-        if old_vertex not in self.adjacency or new_vertex in self.adjacency:
-            return False
-        neighbors = self.adjacency.pop(old_vertex)
-        self.adjacency[new_vertex] = neighbors
-        for neighbor in neighbors:
-            self.adjacency[neighbor].discard(old_vertex)
-            self.adjacency[neighbor].add(new_vertex)
-        return True
-
-    def neighbors(self, vertex: str) -> list[str]:
-        """Return directly connected vertices in stable sorted order."""
-        return sorted(self.adjacency.get(vertex, set()))
-
-    def breadth_first(self, start: str) -> list[str]:
-        """Traverse the connected component from ``start`` using a queue."""
+    def breadth_first_search(self, start):
+        """Classic BFS: visit start, then its neighbors, then their neighbors..."""
         if start not in self.adjacency:
             return []
         visited = {start}
-        queue = deque([start])
-        order: list[str] = []
+        queue = deque([start])   # FIFO queue -> breadth-first order
+        order = []
         while queue:
             current = queue.popleft()
             order.append(current)
@@ -183,169 +190,151 @@ class Graph:
                     queue.append(neighbor)
         return order
 
-    def has_path(self, first: str, second: str) -> bool:
-        """Return whether ``second`` is reachable from ``first``."""
-        return second in self.breadth_first(first)
-
-    def display(self) -> dict[str, list[str]]:
-        """Return a deterministic, read-only-style snapshot for display."""
-        return {
-            vertex: self.neighbors(vertex)
-            for vertex in sorted(self.adjacency)
-        }
+    def display(self):
+        """Return every vertex with its neighbors, sorted for readability."""
+        return {vertex: self.neighbors(vertex) for vertex in sorted(self.adjacency)}
 
 
 # ---------------------------------------------------------------------------
-# Grade decision tree
+# 3. DECISION TREE  (binary tree, walked recursively)
 # ---------------------------------------------------------------------------
-@dataclass(slots=True)
+# Each node either:
+#   - holds a threshold and points to a "yes" branch and a "no" branch, or
+#   - is a leaf holding the final grade.
+# Converting a score to a grade means starting at the root and walking down,
+# going left or right depending on the score, until a leaf is reached.
+
+
+class TreeNode:
+    """One node of the grading decision tree."""
+
+    def __init__(self, threshold=None, yes_branch=None, no_branch=None,
+                 grade=None, gpa=None, message=""):
+        self.threshold = threshold      # only set on branch nodes
+        self.yes_branch = yes_branch    # taken when score >= threshold
+        self.no_branch = no_branch      # taken when score <  threshold
+        self.grade = grade              # only set on leaf nodes
+        self.gpa = gpa
+        self.message = message
+
+    def is_leaf(self):
+        return self.grade is not None
+
+
 class GradeResult:
-    """Final grade information returned after evaluating a score."""
+    """Plain container for the outcome of grading one score."""
 
-    score: float
-    grade: str
-    gpa: float
-    message: str
-
-
-@dataclass(slots=True)
-class DecisionNode:
-    """A threshold branch or terminal grade in the decision tree.
-
-    Branch nodes use ``threshold``, ``passed``, and ``failed``. Leaf nodes use
-    ``grade``, ``gpa``, and ``message``.
-    """
-
-    threshold: Optional[float] = None
-    grade: Optional[str] = None
-    gpa: Optional[float] = None
-    message: str = ""
-    passed: Optional["DecisionNode"] = None
-    failed: Optional["DecisionNode"] = None
-
-    def decide(self, score: float) -> GradeResult:
-        """Recursively follow thresholds until a grade leaf is reached."""
-        # A grade marks this node as a terminal leaf.
-        if self.grade is not None:
-            if self.gpa is None:
-                raise ValueError("A grade decision must include a GPA value.")
-            return GradeResult(score, self.grade, self.gpa, self.message)
-        if self.threshold is None:
-            raise ValueError("Decision node must have either a threshold or a grade.")
-        # Scores equal to the threshold take the passing branch.
-        next_node = self.passed if score >= self.threshold else self.failed
-        if next_node is None:
-            raise ValueError("Decision tree is incomplete.")
-        return next_node.decide(score)
+    def __init__(self, score, grade, gpa, message):
+        self.score = score
+        self.grade = grade
+        self.gpa = gpa
+        self.message = message
 
 
 class GradeDecisionTree:
-    """Convert a score into a letter grade and GPA using threshold nodes."""
+    """A small binary decision tree that turns a 0-100 score into a grade."""
 
-    def __init__(self) -> None:
-        """Build the A/B/C/D/F threshold tree from highest to lowest."""
-        self.root = DecisionNode(
-            threshold=90,
-            passed=DecisionNode(grade="A", gpa=4.0, message="Excellent"),
-            failed=DecisionNode(
-                threshold=80,
-                passed=DecisionNode(grade="B", gpa=3.0, message="Very good"),
-                failed=DecisionNode(
-                    threshold=70,
-                    passed=DecisionNode(grade="C", gpa=2.0, message="Good"),
-                    failed=DecisionNode(
-                        threshold=60,
-                        passed=DecisionNode(
-                            grade="D", gpa=1.0, message="Needs improvement"
-                        ),
-                        failed=DecisionNode(grade="F", gpa=0.0, message="Fail"),
-                    ),
-                ),
-            ),
-        )
+    def __init__(self):
+        # Build the tree from the bottom up so each branch can point to the
+        # nodes below it.
+        f_leaf = TreeNode(grade="F", gpa=0.0, message="Fail")
+        d_leaf = TreeNode(grade="D", gpa=1.0, message="Needs improvement")
+        c_leaf = TreeNode(grade="C", gpa=2.0, message="Good")
+        b_leaf = TreeNode(grade="B", gpa=3.0, message="Very good")
+        a_leaf = TreeNode(grade="A", gpa=4.0, message="Excellent")
 
-    def calculate(self, score: float) -> GradeResult:
-        """Validate a percentage score and return its grade result."""
+        branch_60 = TreeNode(threshold=60, yes_branch=d_leaf, no_branch=f_leaf)
+        branch_70 = TreeNode(threshold=70, yes_branch=c_leaf, no_branch=branch_60)
+        branch_80 = TreeNode(threshold=80, yes_branch=b_leaf, no_branch=branch_70)
+        self.root = TreeNode(threshold=90, yes_branch=a_leaf, no_branch=branch_80)
+
+    def calculate(self, score):
+        """Validate the score, then walk the tree from the root to a leaf."""
         if score < 0 or score > 100:
             raise ValueError("Score must be between 0 and 100.")
-        return self.root.decide(score)
+
+        current = self.root
+        while True:
+            # Branch links are optional when a TreeNode is created, so verify
+            # the node before accessing it. This also lets static type checkers
+            # safely narrow ``current`` from TreeNode | None to TreeNode.
+            if current is None:
+                raise RuntimeError("The grade decision tree is incomplete.")
+            if current.is_leaf():
+                return GradeResult(
+                    score, current.grade, current.gpa, current.message
+                )
+            if current.threshold is None:
+                raise RuntimeError("A grade decision branch has no threshold.")
+
+            if score >= current.threshold:
+                current = current.yes_branch
+            else:
+                current = current.no_branch
 
 
 # ---------------------------------------------------------------------------
-# Domain records
+# Domain records (plain classes, no dataclasses)
 # ---------------------------------------------------------------------------
-@dataclass
 class Student:
-    """Student profile plus scores keyed by course code."""
+    def __init__(self, student_id, name, department, year):
+        self.student_id = student_id
+        self.name = name
+        self.department = department
+        self.year = year
+        self.scores = {}  # course_code -> score
 
-    student_id: str
-    name: str
-    department: str
-    year: int
-    scores: dict[str, float] = field(default_factory=dict)
 
-
-@dataclass
 class Course:
-    """Course metadata used for enrollment and GPA weighting."""
+    def __init__(self, code, name, credits):
+        self.code = code
+        self.name = name
+        self.credits = credits
 
-    code: str
-    name: str
-    credits: int
 
-
-@dataclass(frozen=True)
 class User:
-    """Login account; ``student_id`` optionally limits record access."""
+    def __init__(self, username, password, role, student_id=""):
+        self.username = username
+        self.password = password
+        self.role = role
+        self.student_id = student_id
 
-    username: str
-    password: str
-    role: str
-    student_id: str = ""
 
-
+# ---------------------------------------------------------------------------
+# Student Management System
+# ---------------------------------------------------------------------------
 class StudentManagementSystem:
-    """Coordinate records, enrollments, authentication, and grade reports.
+    """Coordinates records, enrollments, authentication, and grade reports.
 
-    IDs and course codes are normalized to uppercase at the public-method
-    boundary. Usernames are normalized to lowercase. Student/course records
-    live in hash tables, while their many-to-many enrollment relationship lives
-    in the graph. Data is in memory and is rebuilt on each program start.
+    - students / courses / users are stored in HashTables (fast lookup by ID).
+    - enrollments (student <-> course) are stored in the Graph.
+    - scores are converted into letter grades using the GradeDecisionTree.
     """
 
-    def __init__(self, data_file: str | Path | None = None) -> None:
-        """Create each structure and load the initial data from ``data.py``.
-
-        ``data_file`` is mainly useful for tests or alternate installations.
-        When omitted, changes are saved to the project's normal ``data.py``.
-        """
+    def __init__(self, data_file=None):
         self._data_file = (
             Path(data_file)
             if data_file is not None
             else Path(__file__).resolve().parents[1] / "data.py"
         )
 
-        # Loading calls the normal CRUD methods. This flag prevents those calls
-        # from rewriting data.py before every initial collection is available.
+        # Prevents saving to disk while the starting data is still loading.
         self._loading_initial_data = True
 
-        # Separate tables prevent key collisions between record categories.
-        self.students: HashTable[str, Student] = HashTable()
-        self.courses: HashTable[str, Course] = HashTable()
-        self.users: HashTable[str, User] = HashTable()
+        self.students = HashTable()
+        self.courses = HashTable()
+        self.users = HashTable()
 
-        # The graph contains prefixed vertices such as ``student:S001`` and
-        # ``course:CS101``. Prefixes keep both ID namespaces unambiguous.
+        # Vertices are prefixed ("student:S001" / "course:CS101") so the two
+        # ID spaces never collide inside the same graph.
         self.enrollments = Graph()
         self.grade_tree = GradeDecisionTree()
 
-        # Records/courses must exist before enrollments and scores are loaded.
         self._insert_demo_data()
         self._insert_default_users()
         self._loading_initial_data = False
 
-    def _insert_demo_data(self) -> None:
-        """Load records in dependency order so references are always valid."""
+    def _insert_demo_data(self):
         for student in STUDENTS:
             self.insert_student(**student)
         for course in COURSES:
@@ -355,25 +344,20 @@ class StudentManagementSystem:
         for score in SCORES:
             self.record_score(**score)
 
-    # Authentication operations
-    def _insert_default_users(self) -> None:
-        """Load login accounts into a username-keyed hash table."""
+    # -- Authentication -----------------------------------------------------
+    def _insert_default_users(self):
         for user_data in USERS:
             user = User(**user_data)
-            # Usernames in data.py are expected to use their canonical form.
             self.users.insert(user.username, user)
 
-    def authenticate(self, username: str, password: str) -> User | None:
-        """Return the matching account, or ``None`` for invalid credentials."""
+    def authenticate(self, username, password):
         user = self.users.search(username.strip().lower())
         if user is None or user.password != password:
             return None
         return user
 
-    # Student CRUD operations
-    def insert_student(self, student_id: str, name: str, department: str, year: int) -> None:
-        """Validate and insert a student into both the table and graph."""
-        # Canonical IDs make lookup case-insensitive throughout the program.
+    # -- Student CRUD ---------------------------------------------------
+    def insert_student(self, student_id, name, department, year):
         student_id = student_id.strip().upper()
         if not student_id or not name.strip() or not department.strip():
             raise ValueError("Student ID, name, and department are required.")
@@ -384,35 +368,28 @@ class StudentManagementSystem:
 
         student = Student(student_id, name.strip(), department.strip(), year)
         self.students.insert(student_id, student)
-        # Create the isolated vertex now; enrollment edges can be added later.
-        self.enrollments.insert(self._student_vertex(student_id))
+        self.enrollments.add_vertex(self._student_vertex(student_id))
         self._persist_data()
 
-    def add_student(self, student_id: str, name: str, department: str, year: int) -> None:
-        """Backward-compatible name for insert_student."""
+    def add_student(self, student_id, name, department, year):
         self.insert_student(student_id, name, department, year)
 
-    def delete_student(self, student_id: str) -> bool:
-        """Delete a student and its enrollments unless an account links to it."""
+    def delete_student(self, student_id):
         student_id = student_id.strip().upper()
-        # A linked student/parent account must never point at a deleted record.
         if any(user.student_id.upper() == student_id for user in self.users.values()):
             raise ValueError(
                 "Cannot delete this student because a login account is linked to it."
             )
         if not self.students.delete(student_id):
             return False
-        # Graph deletion also removes every course edge for this student.
-        self.enrollments.delete(self._student_vertex(student_id))
+        self.enrollments.remove_vertex(self._student_vertex(student_id))
         self._persist_data()
         return True
 
-    def search_student_by_id(self, student_id: str) -> Student | None:
-        """Look up one student by a case-insensitive ID."""
+    def search_student_by_id(self, student_id):
         return self.students.search(student_id.strip().upper())
 
-    def search_students(self, keyword: str) -> list[Student]:
-        """Search IDs, names, and departments with a case-insensitive term."""
+    def search_students(self, keyword):
         keyword = keyword.strip().lower()
         matches = [
             student
@@ -421,8 +398,7 @@ class StudentManagementSystem:
         ]
         return sorted(matches, key=lambda student: student.student_id)
 
-    def update_student(self, student_id: str, name: str, department: str, year: int) -> None:
-        """Update the editable profile fields of an existing student."""
+    def update_student(self, student_id, name, department, year):
         student_id = student_id.strip().upper()
         student = self._get_student(student_id)
         if not name.strip() or not department.strip():
@@ -436,20 +412,14 @@ class StudentManagementSystem:
         self.students.update(student_id, student)
         self._persist_data()
 
-    def display_students(self) -> list[Student]:
-        """Return every student sorted by ID for predictable display."""
-        return sorted(
-            (student for _, student in self.students.display()),
-            key=lambda student: student.student_id,
-        )
+    def display_students(self):
+        return sorted(self.students.values(), key=lambda student: student.student_id)
 
-    def list_students(self) -> list[Student]:
-        """Backward-compatible name for display_students."""
+    def list_students(self):
         return self.display_students()
 
-    # Course CRUD operations
-    def insert_course(self, code: str, name: str, credits: int) -> None:
-        """Validate and insert a course into both the table and graph."""
+    # -- Course CRUD ----------------------------------------------------
+    def insert_course(self, code, name, credits):
         code = code.strip().upper()
         if not code or not name.strip():
             raise ValueError("Course code and name are required.")
@@ -459,32 +429,26 @@ class StudentManagementSystem:
             raise ValueError("Credits must be at least 1.")
 
         self.courses.insert(code, Course(code, name.strip(), credits))
-        # Courses start as isolated vertices until students enroll.
-        self.enrollments.insert(self._course_vertex(code))
+        self.enrollments.add_vertex(self._course_vertex(code))
         self._persist_data()
 
-    def add_course(self, code: str, name: str, credits: int) -> None:
-        """Backward-compatible name for insert_course."""
+    def add_course(self, code, name, credits):
         self.insert_course(code, name, credits)
 
-    def delete_course(self, code: str) -> bool:
-        """Delete a course, its enrollment edges, and associated scores."""
+    def delete_course(self, code):
         code = code.strip().upper()
         if not self.courses.delete(code):
             return False
-        self.enrollments.delete(self._course_vertex(code))
-        # Scores are stored on Student, so they require explicit cleanup.
+        self.enrollments.remove_vertex(self._course_vertex(code))
         for student in self.students.values():
             student.scores.pop(code, None)
         self._persist_data()
         return True
 
-    def search_course_by_code(self, code: str) -> Course | None:
-        """Look up one course by a case-insensitive code."""
+    def search_course_by_code(self, code):
         return self.courses.search(code.strip().upper())
 
-    def search_courses(self, keyword: str) -> list[Course]:
-        """Search course codes and names with a case-insensitive term."""
+    def search_courses(self, keyword):
         keyword = keyword.strip().lower()
         matches = [
             course
@@ -493,8 +457,7 @@ class StudentManagementSystem:
         ]
         return sorted(matches, key=lambda course: course.code)
 
-    def update_course(self, code: str, name: str, credits: int) -> None:
-        """Update the name and credit weight of an existing course."""
+    def update_course(self, code, name, credits):
         code = code.strip().upper()
         course = self._get_course(code)
         if not name.strip():
@@ -507,20 +470,14 @@ class StudentManagementSystem:
         self.courses.update(code, course)
         self._persist_data()
 
-    def display_courses(self) -> list[Course]:
-        """Return every course sorted by code for predictable display."""
-        return sorted(
-            (course for _, course in self.courses.display()),
-            key=lambda course: course.code,
-        )
+    def display_courses(self):
+        return sorted(self.courses.values(), key=lambda course: course.code)
 
-    def list_courses(self) -> list[Course]:
-        """Backward-compatible name for display_courses."""
+    def list_courses(self):
         return self.display_courses()
 
-    # Enrollment and scoring operations
-    def enroll(self, student_id: str, course_code: str) -> None:
-        """Connect an existing student and course in the enrollment graph."""
+    # -- Enrollment and scoring ------------------------------------------
+    def enroll(self, student_id, course_code):
         student_id = student_id.strip().upper()
         course_code = course_code.strip().upper()
         self._get_student(student_id)
@@ -530,8 +487,7 @@ class StudentManagementSystem:
         )
         self._persist_data()
 
-    def record_score(self, student_id: str, course_code: str, score: float) -> None:
-        """Save a valid score for a student enrolled in the given course."""
+    def record_score(self, student_id, course_code, score):
         student_id = student_id.strip().upper()
         course_code = course_code.strip().upper()
         student = self._get_student(student_id)
@@ -540,17 +496,14 @@ class StudentManagementSystem:
             self._student_vertex(student_id), self._course_vertex(course_code)
         ):
             raise ValueError("Student is not enrolled in this course.")
-        # Calculation validates the 0-100 range before the score is persisted.
-        self.grade_tree.calculate(score)
+        self.grade_tree.calculate(score)  # validates the 0-100 range
         student.scores[course_code] = score
         self._persist_data()
 
-    def student_courses(self, student_id: str) -> list[Course]:
-        """Return the courses in which a student is enrolled."""
+    def student_courses(self, student_id):
         student = self._get_student(student_id.strip().upper())
-        # A student vertex should only connect to course-prefixed vertices.
         course_codes = [
-            vertex.removeprefix("course:")
+            vertex[len("course:"):]
             for vertex in self.enrollments.neighbors(self._student_vertex(student.student_id))
             if vertex.startswith("course:")
         ]
@@ -559,12 +512,10 @@ class StudentManagementSystem:
             key=lambda course: course.code,
         )
 
-    def course_students(self, course_code: str) -> list[Student]:
-        """Return the students enrolled in a course."""
+    def course_students(self, course_code):
         course = self._get_course(course_code.strip().upper())
-        # A course vertex should only connect to student-prefixed vertices.
         student_ids = [
-            vertex.removeprefix("student:")
+            vertex[len("student:"):]
             for vertex in self.enrollments.neighbors(self._course_vertex(course.code))
             if vertex.startswith("student:")
         ]
@@ -573,8 +524,7 @@ class StudentManagementSystem:
             key=lambda student: student.student_id,
         )
 
-    def student_gpa_report(self, student_id: str) -> str:
-        """Create a per-course and credit-weighted GPA report."""
+    def student_gpa_report(self, student_id):
         student = self._get_student(student_id.strip().upper())
         lines = [f"GPA for {student.student_id} - {student.name}:"]
         graded_courses = [
@@ -590,7 +540,6 @@ class StudentManagementSystem:
         for course in graded_courses:
             score = student.scores[course.code]
             result = self.grade_tree.calculate(score)
-            # More-credit courses contribute proportionally more to the GPA.
             total_grade_points += result.gpa * course.credits
             total_credits += course.credits
             lines.append(
@@ -601,12 +550,10 @@ class StudentManagementSystem:
         lines.append(f"Overall GPA: {overall_gpa:.2f}")
         return "\n".join(lines)
 
-    def student_grade_report(self, student_id: str) -> str:
-        """Backward-compatible name for student_gpa_report."""
+    def student_grade_report(self, student_id):
         return self.student_gpa_report(student_id)
 
-    def student_information(self, student_id: str) -> str:
-        """Create a profile summary for a student or parent account."""
+    def student_information(self, student_id):
         student = self._get_student(student_id.strip().upper())
         return "\n".join(
             [
@@ -617,8 +564,7 @@ class StudentManagementSystem:
             ]
         )
 
-    def student_report(self, student_id: str) -> str:
-        """Create a complete profile, course, score, and GPA summary."""
+    def student_report(self, student_id):
         student = self._get_student(student_id.strip().upper())
         courses = self.student_courses(student.student_id)
         lines = [
@@ -641,18 +587,12 @@ class StudentManagementSystem:
             lines.append(overall_line)
         return "\n".join(lines)
 
-    def display_relationships(self) -> dict[str, list[str]]:
-        """Return all enrollment vertices and edges for administrator display."""
+    def display_relationships(self):
         return self.enrollments.display()
 
-    # Persistence helpers
-    def _persist_data(self) -> None:
-        """Atomically save the complete in-memory state to ``data.py``.
-
-        Saving every related collection together keeps students, courses,
-        enrollments, and scores consistent. A temporary file is replaced only
-        after the complete Python source has been written successfully.
-        """
+    # -- Persistence ------------------------------------------------------
+    def _persist_data(self):
+        """Save the complete in-memory state to data.py."""
         if self._loading_initial_data:
             return
 
@@ -675,16 +615,9 @@ class StudentManagementSystem:
             for student in self.display_students()
         )
         courses = tuple(
-            {
-                "code": course.code,
-                "name": course.name,
-                "credits": course.credits,
-            }
+            {"code": course.code, "name": course.name, "credits": course.credits}
             for course in self.display_courses()
         )
-
-        # Derive relationships from the graph instead of maintaining a second
-        # enrollment collection that could become out of sync.
         enrollments = tuple(
             {"student_id": student.student_id, "course_code": course.code}
             for student in self.display_students()
@@ -712,7 +645,6 @@ class StudentManagementSystem:
             '"""Persistent data for the Student Management System.\n\n'
             "This file is updated automatically when records change through "
             'the console.\n"""\n\n'
-            "from __future__ import annotations\n\n\n"
         )
         source += "\n\n".join(
             f"{name} = {pformat(values, width=88, sort_dicts=False)}"
@@ -725,31 +657,26 @@ class StudentManagementSystem:
             temporary_file.write_text(source, encoding="utf-8")
             temporary_file.replace(self._data_file)
         except OSError as exc:
-            # The menu already displays ValueError messages cleanly to users.
             temporary_file.unlink(missing_ok=True)
             raise ValueError(f"Could not save data to '{self._data_file}'.") from exc
 
-    # Internal lookup helpers centralize consistent not-found errors.
-    def _get_student(self, student_id: str) -> Student:
-        """Return an existing student or raise a user-facing ``ValueError``."""
+    # -- Internal lookup helpers ------------------------------------------
+    def _get_student(self, student_id):
         student = self.students.search(student_id)
         if student is None:
             raise ValueError(f"Student '{student_id}' was not found.")
         return student
 
-    def _get_course(self, code: str) -> Course:
-        """Return an existing course or raise a user-facing ``ValueError``."""
+    def _get_course(self, code):
         course = self.courses.search(code)
         if course is None:
             raise ValueError(f"Course '{code}' was not found.")
         return course
 
     @staticmethod
-    def _student_vertex(student_id: str) -> str:
-        """Create the graph namespace key for a student ID."""
+    def _student_vertex(student_id):
         return f"student:{student_id}"
 
     @staticmethod
-    def _course_vertex(code: str) -> str:
-        """Create the graph namespace key for a course code."""
+    def _course_vertex(code):
         return f"course:{code}"
