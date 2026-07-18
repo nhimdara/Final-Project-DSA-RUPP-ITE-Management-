@@ -3,11 +3,14 @@
 A small console project that uses data structures directly. It does not use
 MVC, a database, or third-party packages.
 
-## Data structures
+## Combined data structures
 
-- `HashTable` stores students and courses and provides fast ID/code lookup.
+The main implementations are combined in `data_structures/student_management.py`:
+
+- `HashTable` stores students, courses, and users for fast key lookup.
 - `Graph` connects students to the courses in which they are enrolled.
-- `GradeDecisionTree` converts numeric scores into GPA values.
+- `GradeDecisionTree` converts numeric scores into grades and GPA values.
+- `StudentManagementSystem` coordinates all three structures.
 
 ## Features
 
@@ -22,9 +25,9 @@ MVC, a database, or third-party packages.
 - Ask student and parent users for a valid student ID before displaying records
 - Let student and parent accounts view student information and GPA separately
 
-Data is kept in memory, so it resets when the program exits.
-Initial users, students, courses, enrollments, and scores are stored in
-`data.py`. Edit that file to change the data loaded at startup.
+Users, students, courses, enrollments, and scores are stored in `data.py`.
+Changes made through the console are written back to that file automatically,
+so they remain available after the program restarts.
 
 ## Demo accounts
 
