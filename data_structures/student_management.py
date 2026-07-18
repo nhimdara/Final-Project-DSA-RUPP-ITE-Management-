@@ -143,13 +143,16 @@ class Graph:
             self.adjacency[vertex] = []
 
     def add_edge(self, first, second):
-        """Connect two vertices, creating them first if needed."""
+        """Connect two vertices and return whether a new edge was created."""
         self.add_vertex(first)
         self.add_vertex(second)
+        if self.has_edge(first, second):
+            return False
         if second not in self.adjacency[first]:
             self.adjacency[first].append(second)
         if first not in self.adjacency[second]:
             self.adjacency[second].append(first)
+        return True
 
     def has_edge(self, first, second):
         """Return True if first and second are directly connected."""
@@ -482,10 +485,16 @@ class StudentManagementSystem:
         course_code = course_code.strip().upper()
         self._get_student(student_id)
         self._get_course(course_code)
-        self.enrollments.add_edge(
+        created = self.enrollments.add_edge(
             self._student_vertex(student_id), self._course_vertex(course_code)
         )
+        if not created:
+            raise ValueError(
+                f"Student '{student_id}' is already enrolled in course "
+                f"'{course_code}'."
+            )
         self._persist_data()
+        return True
 
     def record_score(self, student_id, course_code, score):
         student_id = student_id.strip().upper()

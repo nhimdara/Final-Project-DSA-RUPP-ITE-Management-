@@ -18,6 +18,7 @@ The main implementations are combined in `data_structures/student_management.py`
 - Insert, delete, search, update, and display students
 - Insert, delete, search, update, and display courses
 - Enroll a student in a course
+- Reject duplicate enrollment with a clear error
 - Record scores and calculate GPA on a 4.0 scale
 - Print a student's course report
 - Let students view their enrolled courses and credit-weighted GPA
@@ -49,3 +50,15 @@ python main.py
 ```
 
 The program only needs Python 3.9 or newer.
+
+## Algorithm notes
+
+- `HashTable` is a custom array-of-buckets implementation using separate
+  chaining. Python's `hash()` only calculates the bucket index; storage,
+  collision handling, lookup, update, and deletion are implemented manually.
+- Exact student-ID and course-code lookups use the hash table. Free-text
+  substring searches are intentionally linear because they may match any part
+  of a name, department, ID, or code.
+- The grading tree implements the documented A/B/C/D/F 4.0 scale. Courses with
+  no recorded score are displayed as pending and are excluded from GPA; they
+  are not treated as failures.
