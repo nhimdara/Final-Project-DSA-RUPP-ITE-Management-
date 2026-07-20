@@ -1,4 +1,5 @@
-"""Student Management System - core data structures.
+"""
+Student Management System - core data structures.
 
 This file re-implements the three data structures from your Data Structures
 course using the classic textbook approach, instead of relying on Python's
