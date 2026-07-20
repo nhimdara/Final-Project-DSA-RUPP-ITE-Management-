@@ -3,7 +3,13 @@
 from __future__ import annotations
 
 from data import USERS
-from data_structures.student_management import Course, Student, StudentManagementSystem, User
+from data_structures.student_management import (
+    DEPARTMENT,
+    Course,
+    Student,
+    StudentManagementSystem,
+    User,
+)
 
 
 def read_int(label: str) -> int:
@@ -11,6 +17,12 @@ def read_int(label: str) -> int:
         return int(input(label).strip())
     except ValueError as exc:
         raise ValueError("Please enter a whole number.") from exc
+
+
+def read_department(label: str = "Department") -> str:
+    """Display and return the system's single department."""
+    print(f"{label}: {DEPARTMENT}")
+    return DEPARTMENT
 
 
 def show_students(system: StudentManagementSystem, students: list[Student] | None = None) -> None:
@@ -63,7 +75,7 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
             if choice == "1":
                 system.insert_student(
                     input("Student ID: "), input("Name: "),
-                    input("Department: "), read_int("Year: "),
+                    read_department(), read_int("Year: "),
                 )
                 print("Student inserted.")
             elif choice == "2":
@@ -98,7 +110,7 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
             elif choice == "11":
                 system.update_student(
                     input("Student ID: "), input("New name: "),
-                    input("New department: "), read_int("New year: "),
+                    read_department("New department"), read_int("New year: "),
                 )
                 print("Student updated.")
             elif choice == "12":

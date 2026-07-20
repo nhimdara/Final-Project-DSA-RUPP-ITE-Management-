@@ -13,10 +13,14 @@ code reads the same way it would in a lesson or a textbook.
 """
 
 from collections import deque
+import math
 from pathlib import Path
 from pprint import pformat
 
 from data import COURSES, ENROLLMENTS, SCORES, STUDENTS, USERS
+
+
+DEPARTMENT = "Information Technology Engineering"
 
 
 # ---------------------------------------------------------------------------
@@ -253,6 +257,8 @@ class GradeDecisionTree:
 
     def calculate(self, score):
         """Validate the score, then walk the tree from the root to a leaf."""
+        if not isinstance(score, (int, float)) or not math.isfinite(score):
+            raise ValueError("Score must be a finite number between 0 and 100.")
         if score < 0 or score > 100:
             raise ValueError("Score must be between 0 and 100.")
 
@@ -362,8 +368,10 @@ class StudentManagementSystem:
     # -- Student CRUD ---------------------------------------------------
     def insert_student(self, student_id, name, department, year):
         student_id = student_id.strip().upper()
-        if not student_id or not name.strip() or not department.strip():
-            raise ValueError("Student ID, name, and department are required.")
+        if not student_id or not name.strip():
+            raise ValueError("Student ID and name are required.")
+        if department.strip() != DEPARTMENT:
+            raise ValueError(f"Department must be '{DEPARTMENT}'.")
         if self.students.contains(student_id):
             raise ValueError("Student ID already exists.")
         if year < 1:
@@ -404,8 +412,10 @@ class StudentManagementSystem:
     def update_student(self, student_id, name, department, year):
         student_id = student_id.strip().upper()
         student = self._get_student(student_id)
-        if not name.strip() or not department.strip():
-            raise ValueError("Student name and department are required.")
+        if not name.strip():
+            raise ValueError("Student name is required.")
+        if department.strip() != DEPARTMENT:
+            raise ValueError(f"Department must be '{DEPARTMENT}'.")
         if year < 1:
             raise ValueError("Year must be at least 1.")
 
