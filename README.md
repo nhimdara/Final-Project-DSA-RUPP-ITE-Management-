@@ -51,6 +51,12 @@ python main.py
 
 The program only needs Python 3.9 or newer.
 
+## System diagrams
+
+- [Use-case diagram](assets/diagrams/usecase.png) ([editable SVG](assets/diagrams/usecase.svg))
+- [System architecture diagram](assets/diagrams/system_diagram.png) ([editable SVG](assets/diagrams/system_diagram.svg))
+- [Application flowchart](assets/diagrams/flowchart.png) ([editable SVG](assets/diagrams/flowchart.svg))
+
 ## Algorithm notes
 
 - `HashTable` is a custom array-of-buckets implementation using separate

@@ -1,0 +1,75 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1600" viewBox="0 0 1600 1600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#fbfdff"/><stop offset="1" stop-color="#edf4ff"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="4" stdDeviation="7" flood-opacity=".13"/></filter>
+    <marker id="arrow" markerWidth="12" markerHeight="12" refX="10" refY="6" orient="auto"><path d="M0 0L12 6L0 12Z" fill="#294766"/></marker>
+    <style>
+      text{font-family:Segoe UI,Arial,sans-serif;fill:#10203d}.title{font-size:38px;font-weight:800}.subtitle{font-size:18px;fill:#53627c}
+      .node{stroke-width:2;filter:url(#shadow)}.label{font-size:19px;font-weight:700;text-anchor:middle;dominant-baseline:middle}.small{font-size:15px;fill:#596985;text-anchor:middle}.menu-title{font-size:20px;font-weight:750;text-anchor:middle}.menu-text{font-size:15px;fill:#53627c;text-anchor:middle}
+      .flow{fill:none;stroke:#294766;stroke-width:3;marker-end:url(#arrow)}.yes{font-size:16px;font-weight:750;fill:#23814d}.no{font-size:16px;font-weight:750;fill:#c33e4a}
+    </style>
+  </defs>
+  <rect width="1600" height="1600" fill="url(#bg)"/>
+  <text x="800" y="55" class="title" text-anchor="middle">STUDENT MANAGEMENT SYSTEM FLOWCHART</text>
+  <text x="800" y="88" class="subtitle" text-anchor="middle">Authentication • role menus • data-structure processing • persistence</text>
+
+  <!-- Login flow -->
+  <rect x="685" y="120" width="230" height="62" rx="31" fill="#e7f7ed" stroke="#2f8d57" class="node"/><text x="800" y="151" class="label">START</text>
+  <rect x="630" y="225" width="340" height="72" rx="14" fill="#fff4da" stroke="#d99a16" class="node"/><text x="800" y="261" class="label">Enter username + password</text>
+  <polygon points="800,345 945,420 800,495 655,420" fill="#fff0f1" stroke="#cb4d5d" class="node"/><text x="800" y="411" class="label">Credentials valid?</text>
+  <path d="M800 182V205" class="flow"/><path d="M800 297V325" class="flow"/>
+  <path d="M655 420H535V261H610" class="flow"/><text x="565" y="403" class="no">NO — retry</text>
+  <path d="M800 495V530" class="flow"/><text x="824" y="521" class="yes">YES</text>
+
+  <!-- Role decision -->
+  <polygon points="800,540 960,620 800,700 640,620" fill="#f3edff" stroke="#7351bd" class="node"/>
+  <text x="800" y="610" class="label">Select user role</text><text x="800" y="643" class="small">administrator • teacher • student • parent</text>
+
+  <!-- Role menu cards -->
+  <rect x="50" y="780" width="330" height="220" rx="22" fill="#ecf9f1" stroke="#2f8d57" class="node"/>
+  <text x="215" y="822" class="menu-title">ADMINISTRATOR</text><text x="215" y="861" class="menu-text">Manage students and courses</text><text x="215" y="893" class="menu-text">Enroll and record scores</text><text x="215" y="925" class="menu-text">View reports and enrollment graph</text><text x="215" y="965" class="menu-text">Logout</text>
+  <rect x="440" y="780" width="330" height="220" rx="22" fill="#edf5ff" stroke="#3275c5" class="node"/>
+  <text x="605" y="822" class="menu-title">TEACHER</text><text x="605" y="861" class="menu-text">View and search records</text><text x="605" y="893" class="menu-text">Enroll students and input scores</text><text x="605" y="925" class="menu-text">View student report</text><text x="605" y="965" class="menu-text">Logout</text>
+  <rect x="830" y="780" width="330" height="220" rx="22" fill="#f5efff" stroke="#7952bf" class="node"/>
+  <text x="995" y="822" class="menu-title">STUDENT</text><text x="995" y="861" class="menu-text">Verify linked student ID</text><text x="995" y="893" class="menu-text">View information and courses</text><text x="995" y="925" class="menu-text">View GPA and full report</text><text x="995" y="965" class="menu-text">Logout</text>
+  <rect x="1220" y="780" width="330" height="220" rx="22" fill="#fff4eb" stroke="#dd741d" class="node"/>
+  <text x="1385" y="822" class="menu-title">PARENT</text><text x="1385" y="861" class="menu-text">Verify linked student ID</text><text x="1385" y="893" class="menu-text">View student information</text><text x="1385" y="925" class="menu-text">View GPA and full report</text><text x="1385" y="965" class="menu-text">Logout</text>
+
+  <path d="M680 660L215 760" class="flow"/><text x="410" y="710" class="small">administrator</text>
+  <path d="M745 690L605 760" class="flow"/><text x="632" y="718" class="small">teacher</text>
+  <path d="M855 690L995 760" class="flow"/><text x="960" y="718" class="small">student</text>
+  <path d="M920 660L1385 760" class="flow"/><text x="1190" y="710" class="small">parent</text>
+
+  <!-- Merge role menus -->
+  <path d="M215 1000V1040H800M605 1000V1040H800M995 1000V1040H800M1385 1000V1040H800V1070" class="flow"/>
+  <rect x="650" y="1070" width="300" height="66" rx="14" fill="#eef4ff" stroke="#4b75ae" class="node"/><text x="800" y="1103" class="label">Choose a menu option</text>
+  <path d="M800 1136V1162" class="flow"/>
+  <polygon points="800,1170 940,1240 800,1310 660,1240" fill="#fff6e6" stroke="#d88a18" class="node"/><text x="800" y="1240" class="label">Logout selected?</text>
+
+  <!-- Logout -->
+  <path d="M940 1240H1240" class="flow"/><text x="1020" y="1223" class="yes">YES</text>
+  <rect x="1240" y="1208" width="220" height="64" rx="32" fill="#ffecef" stroke="#cb4d5d" class="node"/><text x="1350" y="1240" class="label">END</text>
+
+  <!-- Execute action -->
+  <path d="M660 1240H520" class="flow"/><text x="585" y="1223" class="no">NO</text>
+  <rect x="170" y="1198" width="350" height="84" rx="15" fill="#eef4ff" stroke="#3275c5" class="node"/><text x="345" y="1227" class="label">Validate input and</text><text x="345" y="1255" class="label">execute selected action</text>
+  <path d="M345 1282V1320" class="flow"/>
+  <rect x="150" y="1320" width="390" height="165" rx="20" fill="#fff" stroke="#3275c5" class="node"/>
+  <text x="345" y="1358" class="label">Use required data structure</text><text x="345" y="1395" class="small">Hash table → key lookup and CRUD</text><text x="345" y="1426" class="small">Graph → enrollment relationships</text><text x="345" y="1457" class="small">Decision tree → grade and GPA</text>
+
+  <path d="M540 1402H635" class="flow"/>
+  <polygon points="760,1325 885,1402 760,1479 635,1402" fill="#edfaf2" stroke="#2f8d57" class="node"/><text x="760" y="1393" class="label">Data changed?</text><text x="760" y="1423" class="small">insert / update / delete</text>
+  <path d="M885 1402H990" class="flow"/><text x="928" y="1385" class="yes">YES</text>
+  <rect x="990" y="1360" width="260" height="84" rx="15" fill="#fff4da" stroke="#d99a16" class="node"/><text x="1120" y="1392" class="label">Save complete state</text><text x="1120" y="1421" class="small">rewrite data.py</text>
+
+  <path d="M760 1479V1510H1340" class="flow"/><text x="790" y="1501" class="no">NO</text>
+  <path d="M1250 1402H1340V1450" class="flow"/>
+  <rect x="1190" y="1450" width="300" height="84" rx="15" fill="#f4efff" stroke="#7952bf" class="node"/><text x="1340" y="1480" class="label">Display result or error</text><text x="1340" y="1512" class="small">then return to the same role menu</text>
+
+  <!-- Loop back -->
+  <path d="M1490 1492H1565V1103H970" class="flow"/>
+  <text x="1538" y="1275" class="small" transform="rotate(-90 1538 1275)">return to the active role menu</text>
+
+  <rect x="65" y="1518" width="920" height="55" rx="15" fill="#f2f6fb" stroke="#a9b7c9"/>
+  <text x="525" y="1551" class="small">Validation: IDs must exist • duplicate enrollment is rejected • score must be 0–100 • linked-account access is enforced</text>
+</svg>
