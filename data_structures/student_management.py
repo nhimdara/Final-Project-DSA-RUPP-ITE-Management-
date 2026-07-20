@@ -450,6 +450,19 @@ class StudentManagementSystem:
         self.enrollments.add_vertex(self._course_vertex(code))
         self._persist_data()
 
+    def insert_course_automatically(self, name, credits):
+        """Insert a course with the next available C001-style code."""
+        number = 1
+        code = f"C{number:03d}"
+        # Existing course codes may not be sequential, so keep checking until
+        # an unused generated code is found.
+        while self.courses.contains(code):
+            number += 1
+            code = f"C{number:03d}"
+
+        self.insert_course(code, name, credits)
+        return code
+
     def add_course(self, code, name, credits):
         self.insert_course(code, name, credits)
 

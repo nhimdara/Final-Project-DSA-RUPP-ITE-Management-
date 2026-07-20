@@ -45,6 +45,24 @@ def show_courses(system: StudentManagementSystem, courses: list[Course] | None =
         print(f"{course.code} | {course.name} | {course.credits} credits")
 
 
+def select_course_code(
+    system: StudentManagementSystem, label: str = "Choose course",
+) -> str:
+    """Display existing courses and return the code selected by number."""
+    courses = system.display_courses()
+    if not courses:
+        raise ValueError("No courses are available.")
+
+    print(f"\n{label}:")
+    for number, course in enumerate(courses, start=1):
+        print(f"{number}. {course.code} | {course.name} | {course.credits} credits")
+
+    choice = read_int("Course number: ")
+    if choice < 1 or choice > len(courses):
+        raise ValueError("Please choose a course number from the list.")
+    return courses[choice - 1].code
+
+
 def run_admin_menu(system: StudentManagementSystem) -> None:
     actions = {
         "1": "Insert student",
@@ -88,22 +106,27 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
                 deleted = system.delete_student(input("Student ID: "))
                 print("Student deleted." if deleted else "Student not found.")
             elif choice == "5":
-                system.insert_course(
-                    input("Course code: "), input("Course name: "),
-                    read_int("Credits: "),
+                course_code = system.insert_course_automatically(
+                    input("Course name: "), read_int("Credits: "),
                 )
-                print("Course inserted.")
+                print(f"Course inserted with ID {course_code}.")
             elif choice == "6":
                 show_courses(system)
             elif choice == "7":
-                deleted = system.delete_course(input("Course code: "))
+                deleted = system.delete_course(
+                    select_course_code(system, "Select course to delete")
+                )
                 print("Course deleted." if deleted else "Course not found.")
             elif choice == "8":
-                system.enroll(input("Student ID: "), input("Course code: "))
+                student_id = input("Student ID: ")
+                course_code = select_course_code(system, "Select course for enrollment")
+                system.enroll(student_id, course_code)
                 print("Student enrolled.")
             elif choice == "9":
+                student_id = input("Student ID: ")
+                course_code = select_course_code(system, "Select course for the score")
                 system.record_score(
-                    input("Student ID: "), input("Course code: "),
+                    student_id, course_code,
                     float(input("Score (0-100): ").strip()),
                 )
                 print("Score saved.")
@@ -119,7 +142,8 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
                 show_courses(system, system.search_courses(input("Search: ")))
             elif choice == "13":
                 system.update_course(
-                    input("Course code: "), input("New course name: "),
+                    select_course_code(system, "Select course to update"),
+                    input("New course name: "),
                     read_int("New credits: "),
                 )
                 print("Course updated.")
@@ -164,10 +188,12 @@ def run_teacher_menu(system: StudentManagementSystem) -> None:
             elif choice == "4":
                 show_courses(system, system.search_courses(input("Search: ")))
             elif choice == "5":
-                system.enroll(input("Student ID: "), input("Course code: "))
+                student_id = input("Student ID: ")
+                course_code = select_course_code(system, "Select course for enrollment")
+                system.enroll(student_id, course_code)
                 print("Student enrolled.")
             elif choice == "6":
-                course_code = input("Course code: ").strip().upper()
+                course_code = select_course_code(system, "Select course for scoring")
                 enrolled_students = system.course_students(course_code)
                 if not enrolled_students:
                     print("No students are enrolled in this course.")
