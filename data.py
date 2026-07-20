@@ -143,9 +143,11 @@ ENROLLMENTS = ({'student_id': 'S001', 'course_code': 'APL101'},
  {'student_id': 'S015', 'course_code': 'CS101'},
  {'student_id': 'S015', 'course_code': 'DB101'},
  {'student_id': 'S015', 'course_code': 'ENG01'},
- {'student_id': 'S015', 'course_code': 'MATH101'})
+ {'student_id': 'S015', 'course_code': 'MATH101'},
+ {'student_id': 'S016', 'course_code': 'APL101'},
+ {'student_id': 'S016', 'course_code': 'DB101'})
 
-SCORES = ({'student_id': 'S001', 'course_code': 'APL101', 'score': 50.0},
+SCORES = ({'student_id': 'S001', 'course_code': 'APL101', 'score': 70.0},
  {'student_id': 'S001', 'course_code': 'CS101', 'score': 88},
  {'student_id': 'S001', 'course_code': 'DB101', 'score': 90},
  {'student_id': 'S001', 'course_code': 'MATH101', 'score': 92},
