@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from data import USERS
 from data_structures.student_management import (
-    DEPARTMENT,
     Course,
     Student,
     StudentManagementSystem,
@@ -17,14 +16,6 @@ def read_int(label: str) -> int:
         return int(input(label).strip())
     except ValueError as exc:
         raise ValueError("Please enter a whole number.") from exc
-
-
-def read_department(label: str = "Department") -> str:
-    """Display and return the system's single department."""
-    # The school currently has only one department, so the user does not need
-    # to select or type a department when inserting or updating a student.
-    print(f"{label}: {DEPARTMENT}")
-    return DEPARTMENT
 
 
 def show_students(system: StudentManagementSystem, students: list[Student] | None = None) -> None:
@@ -95,7 +86,7 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
             if choice == "1":
                 system.insert_student(
                     input("Student ID: "), input("Name: "),
-                    read_department(), read_int("Year: "),
+                    read_int("Year: "),
                 )
                 print("Student inserted.")
             elif choice == "2":
@@ -135,7 +126,7 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
             elif choice == "11":
                 system.update_student(
                     input("Student ID: "), input("New name: "),
-                    read_department("New department"), read_int("New year: "),
+                    read_int("New year: "),
                 )
                 print("Student updated.")
             elif choice == "12":

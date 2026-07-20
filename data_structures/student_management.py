@@ -13,7 +13,6 @@ Plain classes (no dataclasses, no typing generics) are used throughout so the
 code reads the same way it would in a lesson or a textbook.
 """
 
-from collections import deque
 import math
 from pathlib import Path
 from pprint import pformat
@@ -44,7 +43,6 @@ class HashTable:
         self.capacity = capacity
         # Each bucket starts as an empty list that will hold [key, value] pairs.
         self.buckets = [[] for _ in range(self.capacity)]
-        self.size = 0  # how many items are currently stored
 
     def _hash(self, key):
         """Turn a key into a bucket index between 0 and capacity - 1."""
@@ -61,7 +59,6 @@ class HashTable:
                 pair[1] = value  # key already there -> just update it
                 return
         bucket.append([key, value])
-        self.size += 1
 
     def search(self, key):
         """Return the value stored for key, or None if it is not present."""
@@ -72,21 +69,6 @@ class HashTable:
                 return stored_value
         return None
 
-    def get(self, key, default=None):
-        """Same as search(), but lets you choose the value returned if missing."""
-        value = self.search(key)
-        return default if value is None else value
-
-    def update(self, key, value):
-        """Replace an existing value. Returns True if key was found."""
-        index = self._hash(key)
-        bucket = self.buckets[index]
-        for pair in bucket:
-            if pair[0] == key:
-                pair[1] = value
-                return True
-        return False
-
     def delete(self, key):
         """Remove a key from the table. Returns True if key was found."""
         index = self._hash(key)
@@ -94,21 +76,12 @@ class HashTable:
         for i, pair in enumerate(bucket):
             if pair[0] == key:
                 bucket.pop(i)
-                self.size -= 1
                 return True
         return False
 
     def contains(self, key):
         """Return True if key exists in the table."""
         return self.search(key) is not None
-
-    def keys(self):
-        """Return a list of every key currently stored."""
-        result = []
-        for bucket in self.buckets:
-            for key, _value in bucket:
-                result.append(key)
-        return result
 
     def values(self):
         """Return a list of every value currently stored."""
@@ -117,18 +90,6 @@ class HashTable:
             for _key, value in bucket:
                 result.append(value)
         return result
-
-    def items(self):
-        """Return a list of (key, value) tuples for every stored pair."""
-        result = []
-        for bucket in self.buckets:
-            for key, value in bucket:
-                result.append((key, value))
-        return result
-
-    def __len__(self):
-        return self.size
-
 
 # ---------------------------------------------------------------------------
 # 2. GRAPH  (adjacency list, undirected)
@@ -155,22 +116,13 @@ class Graph:
         self.add_vertex(second)
         if self.has_edge(first, second):
             return False
-        if second not in self.adjacency[first]:
-            self.adjacency[first].append(second)
-        if first not in self.adjacency[second]:
-            self.adjacency[second].append(first)
+        self.adjacency[first].append(second)
+        self.adjacency[second].append(first)
         return True
 
     def has_edge(self, first, second):
         """Return True if first and second are directly connected."""
         return second in self.adjacency.get(first, [])
-
-    def remove_edge(self, first, second):
-        """Disconnect two vertices, if the edge exists."""
-        if first in self.adjacency and second in self.adjacency[first]:
-            self.adjacency[first].remove(second)
-        if second in self.adjacency and first in self.adjacency[second]:
-            self.adjacency[second].remove(first)
 
     def remove_vertex(self, vertex):
         """Remove a vertex and every edge pointing to it. Returns True if found."""
@@ -184,29 +136,13 @@ class Graph:
         """Return the sorted list of vertices directly connected to vertex."""
         return sorted(self.adjacency.get(vertex, []))
 
-    def breadth_first_search(self, start):
-        """Classic BFS: visit start, then its neighbors, then their neighbors..."""
-        if start not in self.adjacency:
-            return []
-        visited = {start}
-        queue = deque([start])   # FIFO queue -> breadth-first order
-        order = []
-        while queue:
-            current = queue.popleft()
-            order.append(current)
-            for neighbor in self.neighbors(current):
-                if neighbor not in visited:
-                    visited.add(neighbor)
-                    queue.append(neighbor)
-        return order
-
     def display(self):
         """Return every vertex with its neighbors, sorted for readability."""
         return {vertex: self.neighbors(vertex) for vertex in sorted(self.adjacency)}
 
 
 # ---------------------------------------------------------------------------
-# 3. DECISION TREE  (binary tree, walked recursively)
+# 3. DECISION TREE  (binary tree, followed from root to leaf)
 # ---------------------------------------------------------------------------
 # Each node either:
 #   - holds a threshold and points to a "yes" branch and a "no" branch, or
@@ -289,10 +225,10 @@ class GradeDecisionTree:
 # Domain records (plain classes, no dataclasses)
 # ---------------------------------------------------------------------------
 class Student:
-    def __init__(self, student_id, name, department, year):
+    def __init__(self, student_id, name, year):
         self.student_id = student_id
         self.name = name
-        self.department = department
+        self.department = DEPARTMENT
         self.year = year
         self.scores = {}  # course_code -> score
 
@@ -369,25 +305,19 @@ class StudentManagementSystem:
         return user
 
     # -- Student CRUD ---------------------------------------------------
-    def insert_student(self, student_id, name, department, year):
+    def insert_student(self, student_id, name, year):
         student_id = student_id.strip().upper()
         if not student_id or not name.strip():
             raise ValueError("Student ID and name are required.")
-        # Also enforce the fixed department for calls made outside main.py.
-        if department.strip() != DEPARTMENT:
-            raise ValueError(f"Department must be '{DEPARTMENT}'.")
         if self.students.contains(student_id):
             raise ValueError("Student ID already exists.")
         if year < 1:
             raise ValueError("Year must be at least 1.")
 
-        student = Student(student_id, name.strip(), department.strip(), year)
+        student = Student(student_id, name.strip(), year)
         self.students.insert(student_id, student)
         self.enrollments.add_vertex(self._student_vertex(student_id))
         self._persist_data()
-
-    def add_student(self, student_id, name, department, year):
-        self.insert_student(student_id, name, department, year)
 
     def delete_student(self, student_id):
         student_id = student_id.strip().upper()
@@ -409,32 +339,24 @@ class StudentManagementSystem:
         matches = [
             student
             for student in self.students.values()
-            if keyword in f"{student.student_id} {student.name} {student.department}".lower()
+            if keyword in f"{student.student_id} {student.name}".lower()
         ]
         return sorted(matches, key=lambda student: student.student_id)
 
-    def update_student(self, student_id, name, department, year):
+    def update_student(self, student_id, name, year):
         student_id = student_id.strip().upper()
         student = self._get_student(student_id)
         if not name.strip():
             raise ValueError("Student name is required.")
-        # Updating a student must not introduce a second department.
-        if department.strip() != DEPARTMENT:
-            raise ValueError(f"Department must be '{DEPARTMENT}'.")
         if year < 1:
             raise ValueError("Year must be at least 1.")
 
         student.name = name.strip()
-        student.department = department.strip()
         student.year = year
-        self.students.update(student_id, student)
         self._persist_data()
 
     def display_students(self):
         return sorted(self.students.values(), key=lambda student: student.student_id)
-
-    def list_students(self):
-        return self.display_students()
 
     # -- Course CRUD ----------------------------------------------------
     def insert_course(self, code, name, credits):
@@ -463,9 +385,6 @@ class StudentManagementSystem:
         self.insert_course(code, name, credits)
         return code
 
-    def add_course(self, code, name, credits):
-        self.insert_course(code, name, credits)
-
     def delete_course(self, code):
         code = code.strip().upper()
         if not self.courses.delete(code):
@@ -475,9 +394,6 @@ class StudentManagementSystem:
             student.scores.pop(code, None)
         self._persist_data()
         return True
-
-    def search_course_by_code(self, code):
-        return self.courses.search(code.strip().upper())
 
     def search_courses(self, keyword):
         keyword = keyword.strip().lower()
@@ -498,14 +414,10 @@ class StudentManagementSystem:
 
         course.name = name.strip()
         course.credits = credits
-        self.courses.update(code, course)
         self._persist_data()
 
     def display_courses(self):
         return sorted(self.courses.values(), key=lambda course: course.code)
-
-    def list_courses(self):
-        return self.display_courses()
 
     # -- Enrollment and scoring ------------------------------------------
     def enroll(self, student_id, course_code):
@@ -587,9 +499,6 @@ class StudentManagementSystem:
         lines.append(f"Overall GPA: {overall_gpa:.2f}")
         return "\n".join(lines)
 
-    def student_grade_report(self, student_id):
-        return self.student_gpa_report(student_id)
-
     def student_information(self, student_id):
         student = self._get_student(student_id.strip().upper())
         return "\n".join(
@@ -646,7 +555,6 @@ class StudentManagementSystem:
             {
                 "student_id": student.student_id,
                 "name": student.name,
-                "department": student.department,
                 "year": student.year,
             }
             for student in self.display_students()

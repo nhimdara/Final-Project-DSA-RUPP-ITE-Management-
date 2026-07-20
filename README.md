@@ -64,7 +64,7 @@ The program only needs Python 3.9 or newer.
   collision handling, lookup, update, and deletion are implemented manually.
 - Exact student-ID and course-code lookups use the hash table. Free-text
   substring searches are intentionally linear because they may match any part
-  of a name, department, ID, or code.
+  of a name, ID, or course code.
 - The grading tree implements the documented A/B/C/D/F 4.0 scale. Courses with
   no recorded score are displayed as pending and are excluded from GPA; they
   are not treated as failures.
