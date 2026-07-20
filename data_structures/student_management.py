@@ -20,6 +20,8 @@ from pprint import pformat
 from data import COURSES, ENROLLMENTS, SCORES, STUDENTS, USERS
 
 
+# Every student belongs to this single department. Keeping the value in one
+# constant prevents different spellings from being saved in student records.
 DEPARTMENT = "Information Technology Engineering"
 
 
@@ -370,6 +372,7 @@ class StudentManagementSystem:
         student_id = student_id.strip().upper()
         if not student_id or not name.strip():
             raise ValueError("Student ID and name are required.")
+        # Also enforce the fixed department for calls made outside main.py.
         if department.strip() != DEPARTMENT:
             raise ValueError(f"Department must be '{DEPARTMENT}'.")
         if self.students.contains(student_id):
@@ -414,6 +417,7 @@ class StudentManagementSystem:
         student = self._get_student(student_id)
         if not name.strip():
             raise ValueError("Student name is required.")
+        # Updating a student must not introduce a second department.
         if department.strip() != DEPARTMENT:
             raise ValueError(f"Department must be '{DEPARTMENT}'.")
         if year < 1:

@@ -21,6 +21,8 @@ def read_int(label: str) -> int:
 
 def read_department(label: str = "Department") -> str:
     """Display and return the system's single department."""
+    # The school currently has only one department, so the user does not need
+    # to select or type a department when inserting or updating a student.
     print(f"{label}: {DEPARTMENT}")
     return DEPARTMENT
 
