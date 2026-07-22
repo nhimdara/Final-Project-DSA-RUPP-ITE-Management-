@@ -70,7 +70,6 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
         "12": "Search courses",
         "13": "Update course",
         "14": "Display enrollment graph",
-        "15": "Breadth-first search enrollment path",
         "0": "Logout",
     }
 
@@ -145,15 +144,6 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
                     print("The graph is empty.")
                 for vertex, neighbors in relationships.items():
                     print(f"{vertex} -> {', '.join(neighbors) if neighbors else 'none'}")
-            elif choice == "15":
-                print("Enter a student ID or course code for each endpoint.")
-                path = system.breadth_first_search(
-                    input("Start: "), input("Target: "),
-                )
-                if path:
-                    print("Shortest BFS path: " + " -> ".join(path))
-                else:
-                    print("No enrollment path was found.")
             else:
                 print("Invalid choice.")
         except ValueError as exc:

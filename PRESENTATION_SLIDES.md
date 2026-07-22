@@ -12,13 +12,12 @@ This guide contains the structure, content, visual design recommendations, and s
 * **Slide 4:** Data Structure 1: Hash Table (Separate Chaining)
 * **Slide 5:** Hash Table Optimization: Dynamic Rehashing
 * **Slide 6:** Data Structure 2: Enrollment Graph (Adjacency List)
-* **Slide 7:** Graph Algorithm: Breadth-First Search (BFS)
-* **Slide 8:** Data Structure 3: Grade Decision Tree
-* **Slide 9:** Integration Workflow: Student Enrollment & GPA Calculation
-* **Slide 10:** Persistent Storage: Zero-Dependency File Database
-* **Slide 11:** Console Demo Scenarios (RBAC)
-* **Slide 12:** Project Accomplishments & Future Work
-* **Slide 13:** Q&A & Conclusion
+* **Slide 7:** Data Structure 3: Grade Decision Tree
+* **Slide 8:** Integration Workflow: Student Enrollment & GPA Calculation
+* **Slide 9:** Persistent Storage: Zero-Dependency File Database
+* **Slide 10:** Console Demo Scenarios (RBAC)
+* **Slide 11:** Project Accomplishments & Future Work
+* **Slide 12:** Q&A & Conclusion
 
 ---
 
@@ -39,7 +38,7 @@ This guide contains the structure, content, visual design recommendations, and s
   * **Team Members:**
     * *Team Leader:* [Leader Name] — System Integration & Design
     * *Member 1:* [Name] — Custom Hash Table Implementation
-    * *Member 2:* [Name] — Graph & Breadth-First Search
+    * *Member 2:* [Name] — Enrollment Graph
     * *Member 3:* [Name] — Binary Decision Tree & GPA Report
     * *Member 4:* [Name] — Testing & Quality Assurance
 * **Speaker Notes:**
@@ -142,34 +141,7 @@ This guide contains the structure, content, visual design recommendations, and s
 
 ---
 
-## 🎴 Slide 7: Graph Algorithm: Breadth-First Search (BFS)
-
-* **Slide Title:** BFS Enrollment Pathfinding
-* **Visuals:** A flowchart showing BFS queue traversal (FIFO queue, Visited set, Parent dictionary).
-* **Content:**
-  * **Objective:** Find the shortest enrollment path connecting two entities.
-  * **Queue Traversal:** Explores neighbors layer-by-layer.
-  * **Visited Set:** Avoids infinite loops from cycles.
-  * **Parent Dictionary:** Backtracks from the target to rebuild the path.
-* **Code Snippet:**
-  ```python
-  while front < len(queue):
-      current = queue[front]
-      front += 1
-      if current == target:
-          # Rebuild and return shortest path
-      for neighbor in self.neighbors(current):
-          if neighbor not in visited:
-              visited.add(neighbor)
-              parent[neighbor] = current
-              queue.append(neighbor)
-  ```
-* **Speaker Notes:**
-  > "To inspect paths in our graph, we implemented Breadth-First Search. This allows us to answer questions like: 'How is student A connected to course B?' or 'Which students share enrollment paths?'. The algorithm uses a queue to traverse node levels, a visited set to avoid cycles, and records parent links to reconstruct the shortest connection path."
-
----
-
-## 🎴 Slide 8: Data Structure 3: Grade Decision Tree
+## 🎴 Slide 7: Data Structure 3: Grade Decision Tree
 
 * **Slide Title:** Grade Evaluation Decision Tree
 * **Visuals:** A binary decision tree starting at root Node 90 branching down to nodes 80, 70, 60, and leaves (A, B, C, D, F).
@@ -185,7 +157,7 @@ This guide contains the structure, content, visual design recommendations, and s
 
 ---
 
-## 🎴 Slide 9: Integration Workflow: Student Enrollment & GPA Calculation
+## 🎴 Slide 8: Integration Workflow: Student Enrollment & GPA Calculation
 
 * **Slide Title:** Data Operations Integration
 * **Visuals:** A sequence layout illustrating the steps to calculate a credit-weighted GPA.
@@ -201,7 +173,7 @@ This guide contains the structure, content, visual design recommendations, and s
 
 ---
 
-## 🎴 Slide 10: Persistent Storage: Zero-Dependency File Database
+## 🎴 Slide 9: Persistent Storage: Zero-Dependency File Database
 
 * **Slide Title:** Atomic File Persistence
 * **Visuals:** A diagram showing memory objects writing to `.data.py.tmp`, followed by an atomic replacement step to update `data.py`.
@@ -217,14 +189,14 @@ This guide contains the structure, content, visual design recommendations, and s
 
 ---
 
-## 🎴 Slide 11: Console Demo Scenarios (RBAC)
+## 🎴 Slide 10: Console Demo Scenarios (RBAC)
 
 * **Slide Title:** Role-Based Access Scenarios
 * **Visuals:** A table listing the roles and their available features.
 * **Content:**
   | Role | Username / PW | Features |
   | :--- | :--- | :--- |
-  | **Admin** | `admin` / `admin123` | Insert/Delete/Update Students & Courses, Enrollments, BFS Paths |
+  | **Admin** | `admin` / `admin123` | Insert/Delete/Update Students & Courses, Enrollments |
   | **Teacher** | `teacher` / `teacher123` | View Students/Courses, Enroll Students, Record Scores |
   | **Student** | `student` / `student123` | View Information, Enrolled Courses, GPA, and Report Card |
   | **Parent** | `parent` / `parent123` | View Student Information, GPA, and Academic Report |
@@ -233,7 +205,7 @@ This guide contains the structure, content, visual design recommendations, and s
 
 ---
 
-## 🎴 Slide 12: Project Accomplishments & Future Work
+## 🎴 Slide 11: Project Accomplishments & Future Work
 
 * **Slide Title:** Accomplishments & Future Roadmap
 * **Visuals:** Two sections: Left (Accomplished), Right (Future Roadmap).
@@ -251,7 +223,7 @@ This guide contains the structure, content, visual design recommendations, and s
 
 ---
 
-## 🎴 Slide 13: Q&A & Conclusion
+## 🎴 Slide 12: Q&A & Conclusion
 
 * **Slide Title:** Questions & Answers
 * **Visuals:** Large text saying "Thank You!" alongside team contact details.
@@ -259,7 +231,7 @@ This guide contains the structure, content, visual design recommendations, and s
   * **Project Repository:** [Github/ITE-DSA-Management]
   * **Team Roles Summary:**
     * *Hash Table:* [Name]
-    * *Graph & BFS:* [Name]
+    * *Enrollment Graph:* [Name]
     * *Decision Tree:* [Name]
     * *Integration & Presenter:* [Leader Name]
 * **Speaker Notes:**

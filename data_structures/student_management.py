@@ -160,40 +160,6 @@ class Graph:
         """Return the sorted list of vertices directly connected to vertex."""
         return sorted(self.adjacency.get(vertex, []))
 
-    def breadth_first_search(self, start, target):
-        """Return the shortest path from start to target using BFS.
-
-        An empty list means that either vertex does not exist or no path
-        connects them. Vertices are marked as visited when they enter the
-        queue, which prevents cycles from adding the same vertex repeatedly.
-        """
-        if start not in self.adjacency or target not in self.adjacency:
-            return []
-
-        queue = [start]
-        front = 0
-        visited = {start}
-        parent = {start: None}
-
-        while front < len(queue):
-            current = queue[front]
-            front += 1
-
-            if current == target:
-                path = []
-                while current is not None:
-                    path.append(current)
-                    current = parent[current]
-                return list(reversed(path))
-
-            for neighbor in self.neighbors(current):
-                if neighbor not in visited:
-                    visited.add(neighbor)
-                    parent[neighbor] = current
-                    queue.append(neighbor)
-
-        return []
-
     def display(self):
         """Return every vertex with its neighbors, sorted for readability."""
         return {vertex: self.neighbors(vertex) for vertex in sorted(self.adjacency)}
@@ -598,16 +564,6 @@ class StudentManagementSystem:
     def display_relationships(self):
         return self.enrollments.display()
 
-    def breadth_first_search(self, start, target):
-        """Find the shortest enrollment path between two IDs using BFS.
-
-        Inputs may be student IDs (for example, S001), course codes (CS101),
-        or full graph labels such as ``student:S001``.
-        """
-        start_vertex = self._resolve_enrollment_vertex(start)
-        target_vertex = self._resolve_enrollment_vertex(target)
-        return self.enrollments.breadth_first_search(start_vertex, target_vertex)
-
     # -- Persistence ------------------------------------------------------
     def _persist_data(self):
         """Save the complete in-memory state to data.py."""
@@ -689,28 +645,6 @@ class StudentManagementSystem:
         if course is None:
             raise ValueError(f"Course '{code}' was not found.")
         return course
-
-    def _resolve_enrollment_vertex(self, value):
-        value = value.strip()
-        if not value:
-            raise ValueError("A student ID or course code is required.")
-
-        if ":" in value:
-            kind, identifier = value.split(":", 1)
-            kind = kind.strip().lower()
-            identifier = identifier.strip().upper()
-            if kind == "student" and self.students.contains(identifier):
-                return self._student_vertex(identifier)
-            if kind == "course" and self.courses.contains(identifier):
-                return self._course_vertex(identifier)
-        else:
-            identifier = value.upper()
-            if self.students.contains(identifier):
-                return self._student_vertex(identifier)
-            if self.courses.contains(identifier):
-                return self._course_vertex(identifier)
-
-        raise ValueError(f"Student or course '{value}' was not found.")
 
     @staticmethod
     def _student_vertex(student_id):

@@ -20,7 +20,7 @@
 | Week | Phase | Key Activities & Status |
 | :---: | :--- | :--- |
 | **Week 1** | **Planning** | ✅ Problem identification, system architecture design, data structure selection, role assignment. |
-| **Week 2** | **Development** | ✅ Implemented custom `HashTable`, `Graph` (BFS), `GradeDecisionTree`, and Console RBAC menus. |
+| **Week 2** | **Development** | ✅ Implemented custom `HashTable`, enrollment `Graph`, `GradeDecisionTree`, and Console RBAC menus. |
 | **Week 3** | **Finalize (Current)** | ✅ System optimization (`HashTable` rehashing, `Graph` vertex degree analytics, ID validation), slide outline preparation. |
 | **Week 4** | **Evaluation** | ⏳ Rehearsal, final slide submission, live demonstration, and defense. |
 
@@ -36,7 +36,7 @@
      - **Hash Table:** For $O(1)$ fast record lookups.
      - **Undirected Graph:** For modeling student-course relationships.
      - **Binary Decision Tree:** For score-to-grade mapping.
-  3. **Role Assignment:** Assigned tasks among 5 team members (Leader: Integration & Presentation; Member 1: Hash Table; Member 2: Graph & BFS; Member 3: Decision Tree; Member 4: Testing & Demo).
+  3. **Role Assignment:** Assigned tasks among 5 team members (Leader: Integration & Presentation; Member 1: Hash Table; Member 2: Enrollment Graph; Member 3: Decision Tree; Member 4: Testing & Demo).
 
 ---
 
@@ -48,7 +48,7 @@
      - Created $O(1)$ insertion, search, deletion, and retrieval for `Students`, `Courses`, and `Users`.
   2. **Data Structure 2 — Enrollment Graph (`Graph`):**
      - Constructed an **Undirected Adjacency List Graph** connecting student vertices (`student:ID`) to course vertices (`course:CODE`).
-     - Implemented **Breadth-First Search (BFS)** using a queue to find the shortest enrollment path connecting two endpoints.
+     - Implemented an **enrollment graph** using adjacency lists to represent student-course relationships.
   3. **Data Structure 3 — Grade Decision Tree (`GradeDecisionTree`):**
      - Built a binary decision tree with threshold nodes (`90`, `80`, `70`, `60`) mapping scores ($0-100$) recursively to letter grades (`A/B/C/D/F`) and 4.0 GPA points.
   4. **Console & Access Control (`main.py`):**
@@ -66,7 +66,7 @@
   2. **Feature Enhancement — Graph Vertex Degree Analytics:**
      - Implemented graph degree calculations to compute course popularity (vertex degree = number of enrolled students) and added Option 16 to the Administrator menu.
   3. **Data Validation & Stability:**
-     - Sanitized Student IDs and Course Codes to prevent colons (`:`), ensuring graph vertex resolution and BFS pathfinding never fail.
+     - Sanitized Student IDs and Course Codes to prevent colons (`:`), keeping graph vertex labels unambiguous.
   4. **Presentation Preparation:**
      - Mapped project features directly to Dr. Vantha's assessment rubric (Graph 5%, Hash Table 5%, Tree 5%, Presentation 25%, Teamwork 5%).
      - Completed the 12–15 slide outline following Slide 7 guidelines.

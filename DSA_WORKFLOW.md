@@ -84,38 +84,6 @@ graph LR
     S2 --- C1
 ```
 
-### Key Graph Algorithms
-
-#### A. Breadth-First Search (BFS) for Shortest Paths
-This algorithm finds how two entities are connected (e.g., student to course, student to student via shared courses).
-
-```mermaid
-flowchart TD
-    Start[BFS: Start Vertex -> Target Vertex] --> Queue["Initialize queue = [Start], visited = {Start}, parent = {Start: None}"]
-    Queue --> Loop{"Queue not empty?"}
-    
-    Loop -- Yes --> Dequeue["Pop current from queue front"]
-    Dequeue --> TargetCheck{"current == Target?"}
-    
-    TargetCheck -- Yes --> BuildPath["Trace parent dictionary backwards to build path"]
-    BuildPath --> Success[Return Shortest Path]
-    
-    TargetCheck -- No --> Neighbors["Get sorted neighbors of current vertex"]
-    Neighbors --> NeighborLoop{"For each neighbor:"}
-    
-    NeighborLoop --> VisitedCheck{"Neighbor visited?"}
-    VisitedCheck -- No --> Visit["Add to visited, record parent, append to queue"]
-    VisitedCheck -- Yes --> NextNeighbor[Skip]
-    
-    Visit --> NeighborLoop
-    NextNeighbor --> NeighborLoop
-    NeighborLoop -- All processed --> Loop
-    
-    Loop -- No --> Fail[Return Empty Path]
-```
-
----
-
 ## 🌳 3. Grade Decision Tree Workflow
 
 The `GradeDecisionTree` is a binary decision tree used to evaluate numerical student scores ($0-100$) and convert them into letter grades and GPA points.
