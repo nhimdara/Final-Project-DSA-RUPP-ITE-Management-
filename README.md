@@ -25,8 +25,6 @@ The main implementations are combined in `data_structures/student_management.py`
 - Let teachers select a course and input scores for its enrolled students
 - Ask student and parent users for a valid student ID before displaying records
 - Let student and parent accounts view student information and GPA separately
-- Use breadth-first search (BFS) to find the shortest enrollment path between
-  any two students or courses
 
 Users, students, courses, enrollments, and scores are stored in `data.py`.
 Changes made through the console are written back to that file automatically,
@@ -70,6 +68,3 @@ The program only needs Python 3.9 or newer.
 - The grading tree implements the documented A/B/C/D/F 4.0 scale. Courses with
   no recorded score are displayed as pending and are excluded from GPA; they
   are not treated as failures.
-- The enrollment graph uses breadth-first search with a queue to find a
-  shortest path. For example, a path between two students shows the courses
-  and other students that connect them.
