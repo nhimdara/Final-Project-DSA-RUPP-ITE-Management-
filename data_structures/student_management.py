@@ -35,12 +35,14 @@ DEPARTMENT = "Information Technology Engineering"
 
 
 class HashTable:
-    """A hash table with a fixed number of buckets and chaining."""
+    """A hash table with dynamic resizing, rehashing, and separate chaining."""
 
-    def __init__(self, capacity=101):
+    def __init__(self, capacity=101, load_factor_threshold=0.75):
         # capacity = number of buckets. A prime number spreads keys out more
         # evenly, which is why 101 (instead of 100) is used here.
         self.capacity = capacity
+        self.load_factor_threshold = load_factor_threshold
+        self.size = 0
         # Each bucket starts as an empty list that will hold [key, value] pairs.
         self.buckets = [[] for _ in range(self.capacity)]
 
@@ -50,6 +52,16 @@ class HashTable:
         # We only care about a non-negative index, so we take it mod capacity.
         return hash(key) % self.capacity
 
+    def _resize(self):
+        """Rehash all stored elements into a newly expanded bucket array."""
+        old_buckets = self.buckets
+        self.capacity = self.capacity * 2 + 1
+        self.buckets = [[] for _ in range(self.capacity)]
+        self.size = 0
+        for bucket in old_buckets:
+            for key, value in bucket:
+                self.insert(key, value)
+
     def insert(self, key, value):
         """Insert a (key, value) pair, or overwrite the value if key exists."""
         index = self._hash(key)
@@ -58,7 +70,15 @@ class HashTable:
             if pair[0] == key:
                 pair[1] = value  # key already there -> just update it
                 return
+
+        # Trigger dynamic rehashing if load factor threshold is reached
+        if (self.size + 1) / self.capacity >= self.load_factor_threshold:
+            self._resize()
+            index = self._hash(key)
+            bucket = self.buckets[index]
+
         bucket.append([key, value])
+        self.size += 1
 
     def search(self, key):
         """Return the value stored for key, or None if it is not present."""
@@ -76,6 +96,7 @@ class HashTable:
         for i, pair in enumerate(bucket):
             if pair[0] == key:
                 bucket.pop(i)
+                self.size -= 1
                 return True
         return False
 
@@ -90,6 +111,9 @@ class HashTable:
             for _key, value in bucket:
                 result.append(value)
         return result
+
+    def __len__(self):
+        return self.size
 
 # ---------------------------------------------------------------------------
 # 2. GRAPH  (adjacency list, undirected)
@@ -309,6 +333,8 @@ class StudentManagementSystem:
         student_id = student_id.strip().upper()
         if not student_id or not name.strip():
             raise ValueError("Student ID and name are required.")
+        if ":" in student_id:
+            raise ValueError("Student ID cannot contain colons (':').")
         if self.students.contains(student_id):
             raise ValueError("Student ID already exists.")
         if year < 1:
@@ -363,6 +389,8 @@ class StudentManagementSystem:
         code = code.strip().upper()
         if not code or not name.strip():
             raise ValueError("Course code and name are required.")
+        if ":" in code:
+            raise ValueError("Course code cannot contain colons (':').")
         if self.courses.contains(code):
             raise ValueError("Course code already exists.")
         if credits < 1:
