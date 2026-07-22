@@ -198,19 +198,6 @@ class Graph:
         """Return every vertex with its neighbors, sorted for readability."""
         return {vertex: self.neighbors(vertex) for vertex in sorted(self.adjacency)}
 
-    def degree(self, vertex):
-        """Return the degree (number of connected edges) of a vertex."""
-        return len(self.adjacency.get(vertex, []))
-
-    def top_vertices_by_degree(self, prefix=None, top_n=5):
-        """Return top_n vertices with the highest degree, optionally filtered by prefix."""
-        items = []
-        for vertex, neighbors in self.adjacency.items():
-            if prefix is None or vertex.startswith(prefix):
-                items.append((vertex, len(neighbors)))
-        items.sort(key=lambda item: item[1], reverse=True)
-        return items[:top_n]
-
 
 # ---------------------------------------------------------------------------
 # 3. DECISION TREE  (binary tree, followed from root to leaf)
@@ -620,29 +607,6 @@ class StudentManagementSystem:
         start_vertex = self._resolve_enrollment_vertex(start)
         target_vertex = self._resolve_enrollment_vertex(target)
         return self.enrollments.breadth_first_search(start_vertex, target_vertex)
-
-    def most_popular_courses(self, top_n=5):
-        """Return top courses ranked by student enrollment (Graph vertex degree)."""
-        top_vertices = self.enrollments.top_vertices_by_degree(prefix="course:", top_n=top_n)
-        results = []
-        for vertex, degree in top_vertices:
-            course_code = vertex[len("course:"):]
-            course = self.courses.search(course_code)
-            if course:
-                results.append((course, degree))
-        return results
-
-    def course_popularity_report(self, top_n=5):
-        """Generate a formatted report of course popularity based on vertex degree."""
-        popular = self.most_popular_courses(top_n=top_n)
-        if not popular:
-            return "No enrollment data available."
-        lines = [f"=== TOP {len(popular)} MOST POPULAR COURSES (GRAPH VERTEX DEGREE) ==="]
-        for rank, (course, degree) in enumerate(popular, start=1):
-            lines.append(
-                f"  {rank}. [{course.code}] {course.name} - {degree} enrolled students (Vertex Degree: {degree})"
-            )
-        return "\n".join(lines)
 
     # -- Persistence ------------------------------------------------------
     def _persist_data(self):

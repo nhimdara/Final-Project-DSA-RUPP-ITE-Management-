@@ -71,7 +71,6 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
         "13": "Update course",
         "14": "Display enrollment graph",
         "15": "Breadth-first search enrollment path",
-        "16": "Show course popularity analytics (Graph degree)",
         "0": "Logout",
     }
 
@@ -155,8 +154,6 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
                     print("Shortest BFS path: " + " -> ".join(path))
                 else:
                     print("No enrollment path was found.")
-            elif choice == "16":
-                print(system.course_popularity_report())
             else:
                 print("Invalid choice.")
         except ValueError as exc:
