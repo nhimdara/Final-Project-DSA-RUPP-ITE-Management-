@@ -244,6 +244,39 @@ class GradeDecisionTree:
             else:
                 current = current.no_branch
 
+    def display(self):
+        """Return an ASCII view of the grade decision tree."""
+        lines = ["GRADE DECISION TREE"]
+
+        def visit(node, prefix="", connector="", label="", is_last=True):
+            if node is None:
+                lines.append(f"{prefix}{connector}{label}[incomplete]")
+                return
+            if node.is_leaf():
+                lines.append(
+                    f"{prefix}{connector}{label}Grade {node.grade} "
+                    f"(GPA {node.gpa:.1f}) - {node.message}"
+                )
+                return
+
+            lines.append(
+                f"{prefix}{connector}{label}Score >= {node.threshold}?"
+            )
+            child_prefix = (
+                prefix
+                if not connector
+                else f"{prefix}{'    ' if is_last else '|   '}"
+            )
+            visit(
+                node.yes_branch, child_prefix, "|-- ", "Yes: ", False
+            )
+            visit(
+                node.no_branch, child_prefix, "`-- ", "No:  ", True
+            )
+
+        visit(self.root)
+        return "\n".join(lines)
+
 
 # ---------------------------------------------------------------------------
 # Domain records (plain classes, no dataclasses)
