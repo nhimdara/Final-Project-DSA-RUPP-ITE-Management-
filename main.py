@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import shutil
+import textwrap
+
 from data import USERS
 from data_structures.student_management import (
     Course,
@@ -34,6 +37,78 @@ def show_courses(system: StudentManagementSystem, courses: list[Course] | None =
         return
     for course in courses:
         print(f"{course.code} | {course.name} | {course.credits} credits")
+
+
+def show_grade_tree(system: StudentManagementSystem) -> None:
+    """Display the score-to-grade decision tree used by the system."""
+    print(f"\n{system.grade_tree.display()}")
+
+
+def show_enrollment_graph(system: StudentManagementSystem) -> None:
+    """Render the enrollment graph as a compact, course-centered terminal view."""
+    courses = system.display_courses()
+    students = system.display_students()
+    course_enrollments = [
+        (course, system.course_students(course.code)) for course in courses
+    ]
+    enrollment_count = sum(
+        len(enrolled_students)
+        for _, enrolled_students in course_enrollments
+    )
+
+    width = max(46, min(shutil.get_terminal_size((88, 24)).columns, 96))
+    rule = "=" * width
+    divider = "-" * width
+
+    print(f"\n{rule}")
+    print("ENROLLMENT GRAPH".center(width))
+    print(rule)
+    print(
+        f"Courses: {len(courses)}  |  Students: {len(students)}  |  "
+        f"Enrollments: {enrollment_count}"
+    )
+
+    if not courses:
+        print(divider)
+        print("The graph is empty.")
+        print(rule)
+        return
+
+    print(divider)
+    print("COURSE  ->  ENROLLED STUDENTS")
+
+    for course, enrolled_students in course_enrollments:
+        print(divider)
+        count_label = (
+            f"{len(enrolled_students)} student"
+            f"{'' if len(enrolled_students) == 1 else 's'}"
+        )
+        course_label = f"{course.code} - {course.name}"
+        available = width - len(count_label) - 3
+        if len(course_label) > available:
+            course_label = textwrap.shorten(
+                course_label, width=max(8, available), placeholder="..."
+            )
+        print(f"{course_label:<{available}} | {count_label}")
+
+        student_ids = ", ".join(
+            student.student_id for student in enrolled_students
+        )
+        if not student_ids:
+            print("  `-- No students enrolled")
+            continue
+
+        wrapped_ids = textwrap.wrap(
+            student_ids,
+            width=max(1, width - 6),
+            break_long_words=False,
+            break_on_hyphens=False,
+        )
+        for line_number, line in enumerate(wrapped_ids):
+            branch = "`--" if line_number == len(wrapped_ids) - 1 else "|--"
+            print(f"  {branch} {line}")
+
+    print(rule)
 
 
 def select_course_code(
@@ -70,7 +145,7 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
         "12": "Search courses",
         "13": "Update course",
         "14": "Display enrollment graph",
-        "15": "Breadth-first search enrollment path",
+        "15": "Display grade decision tree",
         "0": "Logout",
     }
 
@@ -133,27 +208,22 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
             elif choice == "12":
                 show_courses(system, system.search_courses(input("Search: ")))
             elif choice == "13":
+                current_code = select_course_code(
+                    system, "Select course to update"
+                )
                 system.update_course(
-                    select_course_code(system, "Select course to update"),
+                    current_code,
                     input("New course name: "),
                     read_int("New credits: "),
+                    input(
+                        f"New course code (press Enter to keep {current_code}): "
+                    ) or current_code,
                 )
                 print("Course updated.")
             elif choice == "14":
-                relationships = system.display_relationships()
-                if not relationships:
-                    print("The graph is empty.")
-                for vertex, neighbors in relationships.items():
-                    print(f"{vertex} -> {', '.join(neighbors) if neighbors else 'none'}")
+                show_enrollment_graph(system)
             elif choice == "15":
-                print("Enter a student ID or course code for each endpoint.")
-                path = system.breadth_first_search(
-                    input("Start: "), input("Target: "),
-                )
-                if path:
-                    print("Shortest BFS path: " + " -> ".join(path))
-                else:
-                    print("No enrollment path was found.")
+                show_grade_tree(system)
             else:
                 print("Invalid choice.")
         except ValueError as exc:

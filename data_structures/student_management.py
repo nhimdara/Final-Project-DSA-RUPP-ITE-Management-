@@ -35,12 +35,14 @@ DEPARTMENT = "Information Technology Engineering"
 
 
 class HashTable:
-    """A hash table with a fixed number of buckets and chaining."""
+    """A hash table with dynamic resizing, rehashing, and separate chaining."""
 
-    def __init__(self, capacity=101):
+    def __init__(self, capacity=101, load_factor_threshold=0.75):
         # capacity = number of buckets. A prime number spreads keys out more
         # evenly, which is why 101 (instead of 100) is used here.
         self.capacity = capacity
+        self.load_factor_threshold = load_factor_threshold
+        self.size = 0
         # Each bucket starts as an empty list that will hold [key, value] pairs.
         self.buckets = [[] for _ in range(self.capacity)]
 
@@ -50,6 +52,16 @@ class HashTable:
         # We only care about a non-negative index, so we take it mod capacity.
         return hash(key) % self.capacity
 
+    def _resize(self):
+        """Rehash all stored elements into a newly expanded bucket array."""
+        old_buckets = self.buckets
+        self.capacity = self.capacity * 2 + 1
+        self.buckets = [[] for _ in range(self.capacity)]
+        self.size = 0
+        for bucket in old_buckets:
+            for key, value in bucket:
+                self.insert(key, value)
+
     def insert(self, key, value):
         """Insert a (key, value) pair, or overwrite the value if key exists."""
         index = self._hash(key)
@@ -58,7 +70,15 @@ class HashTable:
             if pair[0] == key:
                 pair[1] = value  # key already there -> just update it
                 return
+
+        # Trigger dynamic rehashing if load factor threshold is reached
+        if (self.size + 1) / self.capacity >= self.load_factor_threshold:
+            self._resize()
+            index = self._hash(key)
+            bucket = self.buckets[index]
+
         bucket.append([key, value])
+        self.size += 1
 
     def search(self, key):
         """Return the value stored for key, or None if it is not present."""
@@ -76,6 +96,7 @@ class HashTable:
         for i, pair in enumerate(bucket):
             if pair[0] == key:
                 bucket.pop(i)
+                self.size -= 1
                 return True
         return False
 
@@ -90,6 +111,9 @@ class HashTable:
             for _key, value in bucket:
                 result.append(value)
         return result
+
+    def __len__(self):
+        return self.size
 
 # ---------------------------------------------------------------------------
 # 2. GRAPH  (adjacency list, undirected)
@@ -135,40 +159,6 @@ class Graph:
     def neighbors(self, vertex):
         """Return the sorted list of vertices directly connected to vertex."""
         return sorted(self.adjacency.get(vertex, []))
-
-    def breadth_first_search(self, start, target):
-        """Return the shortest path from start to target using BFS.
-
-        An empty list means that either vertex does not exist or no path
-        connects them. Vertices are marked as visited when they enter the
-        queue, which prevents cycles from adding the same vertex repeatedly.
-        """
-        if start not in self.adjacency or target not in self.adjacency:
-            return []
-
-        queue = [start]
-        front = 0
-        visited = {start}
-        parent = {start: None}
-
-        while front < len(queue):
-            current = queue[front]
-            front += 1
-
-            if current == target:
-                path = []
-                while current is not None:
-                    path.append(current)
-                    current = parent[current]
-                return list(reversed(path))
-
-            for neighbor in self.neighbors(current):
-                if neighbor not in visited:
-                    visited.add(neighbor)
-                    parent[neighbor] = current
-                    queue.append(neighbor)
-
-        return []
 
     def display(self):
         """Return every vertex with its neighbors, sorted for readability."""
@@ -253,6 +243,39 @@ class GradeDecisionTree:
                 current = current.yes_branch
             else:
                 current = current.no_branch
+
+    def display(self):
+        """Return an ASCII view of the grade decision tree."""
+        lines = ["GRADE DECISION TREE"]
+
+        def visit(node, prefix="", connector="", label="", is_last=True):
+            if node is None:
+                lines.append(f"{prefix}{connector}{label}[incomplete]")
+                return
+            if node.is_leaf():
+                lines.append(
+                    f"{prefix}{connector}{label}Grade {node.grade} "
+                    f"(GPA {node.gpa:.1f}) - {node.message}"
+                )
+                return
+
+            lines.append(
+                f"{prefix}{connector}{label}Score >= {node.threshold}?"
+            )
+            child_prefix = (
+                prefix
+                if not connector
+                else f"{prefix}{'    ' if is_last else '|   '}"
+            )
+            visit(
+                node.yes_branch, child_prefix, "|-- ", "Yes: ", False
+            )
+            visit(
+                node.no_branch, child_prefix, "`-- ", "No:  ", True
+            )
+
+        visit(self.root)
+        return "\n".join(lines)
 
 
 # ---------------------------------------------------------------------------
@@ -343,6 +366,8 @@ class StudentManagementSystem:
         student_id = student_id.strip().upper()
         if not student_id or not name.strip():
             raise ValueError("Student ID and name are required.")
+        if ":" in student_id:
+            raise ValueError("Student ID cannot contain colons (':').")
         if self.students.contains(student_id):
             raise ValueError("Student ID already exists.")
         if year < 1:
@@ -397,6 +422,8 @@ class StudentManagementSystem:
         code = code.strip().upper()
         if not code or not name.strip():
             raise ValueError("Course code and name are required.")
+        if ":" in code:
+            raise ValueError("Course code cannot contain colons (':').")
         if self.courses.contains(code):
             raise ValueError("Course code already exists.")
         if credits < 1:
@@ -438,13 +465,38 @@ class StudentManagementSystem:
         ]
         return sorted(matches, key=lambda course: course.code)
 
-    def update_course(self, code, name, credits):
+    def update_course(self, code, name, credits, new_code=None):
         code = code.strip().upper()
         course = self._get_course(code)
+        new_code = code if new_code is None else new_code.strip().upper()
+        if not new_code:
+            raise ValueError("Course code is required.")
+        if ":" in new_code:
+            raise ValueError("Course code cannot contain colons (':').")
+        if new_code != code and self.courses.contains(new_code):
+            raise ValueError("Course code already exists.")
         if not name.strip():
             raise ValueError("Course name is required.")
         if credits < 1:
             raise ValueError("Credits must be at least 1.")
+
+        if new_code != code:
+            old_vertex = self._course_vertex(code)
+            new_vertex = self._course_vertex(new_code)
+            enrolled_students = self.enrollments.neighbors(old_vertex)
+
+            self.courses.delete(code)
+            course.code = new_code
+            self.courses.insert(new_code, course)
+
+            self.enrollments.add_vertex(new_vertex)
+            for student_vertex in enrolled_students:
+                self.enrollments.add_edge(student_vertex, new_vertex)
+            self.enrollments.remove_vertex(old_vertex)
+
+            for student in self.students.values():
+                if code in student.scores:
+                    student.scores[new_code] = student.scores.pop(code)
 
         course.name = name.strip()
         course.credits = credits
@@ -570,16 +622,6 @@ class StudentManagementSystem:
     def display_relationships(self):
         return self.enrollments.display()
 
-    def breadth_first_search(self, start, target):
-        """Find the shortest enrollment path between two IDs using BFS.
-
-        Inputs may be student IDs (for example, S001), course codes (CS101),
-        or full graph labels such as ``student:S001``.
-        """
-        start_vertex = self._resolve_enrollment_vertex(start)
-        target_vertex = self._resolve_enrollment_vertex(target)
-        return self.enrollments.breadth_first_search(start_vertex, target_vertex)
-
     # -- Persistence ------------------------------------------------------
     def _persist_data(self):
         """Save the complete in-memory state to data.py."""
@@ -661,28 +703,6 @@ class StudentManagementSystem:
         if course is None:
             raise ValueError(f"Course '{code}' was not found.")
         return course
-
-    def _resolve_enrollment_vertex(self, value):
-        value = value.strip()
-        if not value:
-            raise ValueError("A student ID or course code is required.")
-
-        if ":" in value:
-            kind, identifier = value.split(":", 1)
-            kind = kind.strip().lower()
-            identifier = identifier.strip().upper()
-            if kind == "student" and self.students.contains(identifier):
-                return self._student_vertex(identifier)
-            if kind == "course" and self.courses.contains(identifier):
-                return self._course_vertex(identifier)
-        else:
-            identifier = value.upper()
-            if self.students.contains(identifier):
-                return self._student_vertex(identifier)
-            if self.courses.contains(identifier):
-                return self._course_vertex(identifier)
-
-        raise ValueError(f"Student or course '{value}' was not found.")
 
     @staticmethod
     def _student_vertex(student_id):
