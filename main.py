@@ -39,11 +39,6 @@ def show_courses(system: StudentManagementSystem, courses: list[Course] | None =
         print(f"{course.code} | {course.name} | {course.credits} credits")
 
 
-def show_grade_tree(system: StudentManagementSystem) -> None:
-    """Display the score-to-grade decision tree used by the system."""
-    print(f"\n{system.grade_tree.display()}")
-
-
 def show_enrollment_graph(system: StudentManagementSystem) -> None:
     """Render the enrollment graph as a compact, course-centered terminal view."""
     courses = system.display_courses()
@@ -145,7 +140,6 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
         "12": "Search courses",
         "13": "Update course",
         "14": "Display enrollment graph",
-        "15": "Display grade decision tree",
         "0": "Logout",
     }
 
@@ -222,8 +216,6 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
                 print("Course updated.")
             elif choice == "14":
                 show_enrollment_graph(system)
-            elif choice == "15":
-                show_grade_tree(system)
             else:
                 print("Invalid choice.")
         except ValueError as exc:
@@ -239,7 +231,6 @@ def run_teacher_menu(system: StudentManagementSystem) -> None:
         "5": "Enroll student in course",
         "6": "Input student score by course",
         "7": "Show student report",
-        "8": "Display grade decision tree",
         "0": "Logout",
     }
     while True:
@@ -278,8 +269,6 @@ def run_teacher_menu(system: StudentManagementSystem) -> None:
                 print("Score saved.")
             elif choice == "7":
                 print(system.student_report(input("Student ID: ")))
-            elif choice == "8":
-                show_grade_tree(system)
             else:
                 print("Invalid choice.")
         except ValueError as exc:
@@ -315,7 +304,6 @@ def run_student_menu(system: StudentManagementSystem, user: User) -> None:
         print("2. View enrolled courses")
         print("3. View GPA")
         print("4. Show full academic report")
-        print("5. Display grade decision tree")
         print("0. Logout")
         choice = input("Choose: ").strip()
         if choice == "0":
@@ -330,8 +318,6 @@ def run_student_menu(system: StudentManagementSystem, user: User) -> None:
                 print(system.student_gpa_report(student_id))
             elif choice == "4":
                 print(system.student_report(student_id))
-            elif choice == "5":
-                show_grade_tree(system)
             else:
                 print("Invalid choice.")
         except ValueError as exc:
@@ -349,7 +335,6 @@ def run_parent_menu(system: StudentManagementSystem, user: User) -> None:
         print("1. View student information")
         print("2. View GPA")
         print("3. Show student's full academic report")
-        print("4. Display grade decision tree")
         print("0. Logout")
         choice = input("Choose: ").strip()
         if choice == "0":
@@ -364,8 +349,6 @@ def run_parent_menu(system: StudentManagementSystem, user: User) -> None:
             print(system.student_gpa_report(student_id))
         elif choice == "3":
             print(system.student_report(student_id))
-        elif choice == "4":
-            show_grade_tree(system)
         else:
             print("Invalid choice.")
 
