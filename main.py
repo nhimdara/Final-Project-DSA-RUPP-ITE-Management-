@@ -39,6 +39,11 @@ def show_courses(system: StudentManagementSystem, courses: list[Course] | None =
         print(f"{course.code} | {course.name} | {course.credits} credits")
 
 
+def show_grade_tree(system: StudentManagementSystem) -> None:
+    """Display the score-to-grade decision tree used by the system."""
+    print(f"\n{system.grade_tree.display()}")
+
+
 def show_enrollment_graph(system: StudentManagementSystem) -> None:
     """Render the enrollment graph as a compact, course-centered terminal view."""
     courses = system.display_courses()
@@ -140,6 +145,7 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
         "12": "Search courses",
         "13": "Update course",
         "14": "Display enrollment graph",
+        "15": "Display grade decision tree",
         "0": "Logout",
     }
 
@@ -216,6 +222,8 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
                 print("Course updated.")
             elif choice == "14":
                 show_enrollment_graph(system)
+            elif choice == "15":
+                show_grade_tree(system)
             else:
                 print("Invalid choice.")
         except ValueError as exc:
