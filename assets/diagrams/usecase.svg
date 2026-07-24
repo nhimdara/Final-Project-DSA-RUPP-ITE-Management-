@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000" viewBox="0 0 1600 1000">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8fbff"/><stop offset="1" stop-color="#edf4ff"/></linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dx="0" dy="4" stdDeviation="7" flood-opacity=".13"/></filter>
+    <style>
+      text{font-family:Segoe UI,Arial,sans-serif;fill:#10203d}.title{font-size:38px;font-weight:800}.subtitle{font-size:18px;fill:#53627c}
+      .boundary{fill:#fff;stroke:#24466f;stroke-width:2.2}.lane{stroke-width:1.8;filter:url(#shadow)}.lane-title{font-size:21px;font-weight:750}
+      .oval{stroke-width:1.8;filter:url(#shadow)}.label{font-size:17px;font-weight:650;text-anchor:middle;dominant-baseline:middle}.minor{font-size:14px;fill:#596985;text-anchor:middle}
+      .actor{fill:none;stroke-width:4;stroke-linecap:round}.actor-name{font-size:19px;font-weight:750;text-anchor:middle}.association{fill:none;stroke-width:2.5}
+    </style>
+  </defs>
+  <rect width="1600" height="1000" fill="url(#bg)"/>
+  <text x="800" y="57" class="title" text-anchor="middle">STUDENT MANAGEMENT SYSTEM</text>
+  <text x="800" y="90" class="subtitle" text-anchor="middle">Use Case Diagram — role-based functions in the current console application</text>
+
+  <rect x="280" y="120" width="1260" height="805" rx="26" class="boundary" filter="url(#shadow)"/>
+  <text x="330" y="157" font-size="23" font-weight="750">System Boundary</text>
+
+  <!-- Common functions -->
+  <rect x="770" y="138" width="725" height="62" rx="18" fill="#fff9ea" stroke="#e1b14e"/>
+  <text x="835" y="175" font-size="17" font-weight="700">COMMON</text>
+  <ellipse cx="1060" cy="169" rx="145" ry="27" fill="#fff3d8" stroke="#d99500" class="oval"/><text x="1060" y="169" class="label">Authenticate / Login</text>
+  <ellipse cx="1350" cy="169" rx="105" ry="27" fill="#fff3d8" stroke="#d99500" class="oval"/><text x="1350" y="169" class="label">Logout</text>
+
+  <!-- Administrator actor and lane -->
+  <g transform="translate(130 290)" stroke="#167044" class="actor"><circle cy="-38" r="20"/><path d="M0-18V43M-34 2H34M0 43L-30 82M0 43L30 82"/></g>
+  <text x="130" y="395" class="actor-name" fill="#167044">Administrator</text>
+  <path d="M164 292H305" class="association" stroke="#167044"/>
+  <rect x="310" y="220" width="1185" height="150" rx="22" fill="#f0faf4" stroke="#2f8d57" class="lane"/>
+  <text x="345" y="253" class="lane-title" fill="#167044">ADMINISTRATOR MENU</text>
+  <ellipse cx="500" cy="310" rx="145" ry="38" fill="#e8f7ee" stroke="#2f8d57" class="oval"/><text x="500" y="310" class="label">Manage Students</text>
+  <ellipse cx="810" cy="310" rx="145" ry="38" fill="#e8f7ee" stroke="#2f8d57" class="oval"/><text x="810" y="310" class="label">Manage Courses</text>
+  <ellipse cx="1120" cy="310" rx="150" ry="38" fill="#e8f7ee" stroke="#2f8d57" class="oval"/><text x="1120" y="310" class="label">Enrollment &amp; Scores</text>
+  <ellipse cx="1390" cy="310" rx="85" ry="38" fill="#e8f7ee" stroke="#2f8d57" class="oval"/><text x="1390" y="301" class="label">Reports &amp;</text><text x="1390" y="322" class="label">Graph</text>
+
+  <!-- Teacher actor and lane -->
+  <g transform="translate(130 475)" stroke="#1f64b5" class="actor"><circle cy="-38" r="20"/><path d="M0-18V43M-34 2H34M0 43L-30 82M0 43L30 82"/></g>
+  <text x="130" y="580" class="actor-name" fill="#1f64b5">Teacher</text>
+  <path d="M164 477H305" class="association" stroke="#1f64b5"/>
+  <rect x="310" y="405" width="1185" height="150" rx="22" fill="#f1f6ff" stroke="#3275c5" class="lane"/>
+  <text x="345" y="438" class="lane-title" fill="#1f64b5">TEACHER MENU</text>
+  <ellipse cx="500" cy="495" rx="145" ry="38" fill="#e9f2ff" stroke="#3275c5" class="oval"/><text x="500" y="495" class="label">View / Search Records</text>
+  <ellipse cx="810" cy="495" rx="145" ry="38" fill="#e9f2ff" stroke="#3275c5" class="oval"/><text x="810" y="495" class="label">Enroll Student</text>
+  <ellipse cx="1120" cy="495" rx="145" ry="38" fill="#e9f2ff" stroke="#3275c5" class="oval"/><text x="1120" y="495" class="label">Input Course Scores</text>
+  <ellipse cx="1390" cy="495" rx="85" ry="38" fill="#e9f2ff" stroke="#3275c5" class="oval"/><text x="1390" y="495" class="label">View Report</text>
+
+  <!-- Student actor and lane -->
+  <g transform="translate(130 660)" stroke="#6d3db5" class="actor"><circle cy="-38" r="20"/><path d="M0-18V43M-34 2H34M0 43L-30 82M0 43L30 82"/></g>
+  <text x="130" y="765" class="actor-name" fill="#6d3db5">Student</text>
+  <path d="M164 662H305" class="association" stroke="#6d3db5"/>
+  <rect x="310" y="590" width="1185" height="150" rx="22" fill="#f7f2ff" stroke="#7952bf" class="lane"/>
+  <text x="345" y="623" class="lane-title" fill="#6d3db5">STUDENT MENU</text>
+  <ellipse cx="500" cy="680" rx="145" ry="38" fill="#f2ebff" stroke="#7952bf" class="oval"/><text x="500" y="671" class="label">Verify Student ID</text><text x="500" y="697" class="minor">linked-account check</text>
+  <ellipse cx="810" cy="680" rx="145" ry="38" fill="#f2ebff" stroke="#7952bf" class="oval"/><text x="810" y="680" class="label">View Information</text>
+  <ellipse cx="1120" cy="680" rx="145" ry="38" fill="#f2ebff" stroke="#7952bf" class="oval"/><text x="1120" y="680" class="label">View Enrolled Courses</text>
+  <ellipse cx="1390" cy="680" rx="85" ry="38" fill="#f2ebff" stroke="#7952bf" class="oval"/><text x="1390" y="671" class="label">GPA / Full</text><text x="1390" y="692" class="label">Report</text>
+
+  <!-- Parent actor and lane -->
+  <g transform="translate(130 845)" stroke="#d66c15" class="actor"><circle cy="-38" r="20"/><path d="M0-18V43M-34 2H34M0 43L-30 82M0 43L30 82"/></g>
+  <text x="130" y="950" class="actor-name" fill="#d66c15">Parent</text>
+  <path d="M164 847H305" class="association" stroke="#d66c15"/>
+  <rect x="310" y="775" width="1185" height="130" rx="22" fill="#fff6ee" stroke="#dd741d" class="lane"/>
+  <text x="345" y="808" class="lane-title" fill="#d66c15">PARENT MENU</text>
+  <ellipse cx="500" cy="855" rx="145" ry="36" fill="#fff0e4" stroke="#dd741d" class="oval"/><text x="500" y="846" class="label">Verify Student ID</text><text x="500" y="871" class="minor">linked-account check</text>
+  <ellipse cx="810" cy="855" rx="145" ry="36" fill="#fff0e4" stroke="#dd741d" class="oval"/><text x="810" y="855" class="label">View Information</text>
+  <ellipse cx="1120" cy="855" rx="145" ry="36" fill="#fff0e4" stroke="#dd741d" class="oval"/><text x="1120" y="855" class="label">View GPA</text>
+  <ellipse cx="1390" cy="855" rx="85" ry="36" fill="#fff0e4" stroke="#dd741d" class="oval"/><text x="1390" y="846" class="label">View Full</text><text x="1390" y="867" class="label">Report</text>
+
+  <text x="925" y="952" class="minor">Grade and GPA results are calculated by the Grade Decision Tree</text>
+</svg>
