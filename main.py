@@ -208,10 +208,16 @@ def run_admin_menu(system: StudentManagementSystem) -> None:
             elif choice == "12":
                 show_courses(system, system.search_courses(input("Search: ")))
             elif choice == "13":
+                current_code = select_course_code(
+                    system, "Select course to update"
+                )
                 system.update_course(
-                    select_course_code(system, "Select course to update"),
+                    current_code,
                     input("New course name: "),
                     read_int("New credits: "),
+                    input(
+                        f"New course code (press Enter to keep {current_code}): "
+                    ) or current_code,
                 )
                 print("Course updated.")
             elif choice == "14":

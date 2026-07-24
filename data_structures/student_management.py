@@ -465,13 +465,38 @@ class StudentManagementSystem:
         ]
         return sorted(matches, key=lambda course: course.code)
 
-    def update_course(self, code, name, credits):
+    def update_course(self, code, name, credits, new_code=None):
         code = code.strip().upper()
         course = self._get_course(code)
+        new_code = code if new_code is None else new_code.strip().upper()
+        if not new_code:
+            raise ValueError("Course code is required.")
+        if ":" in new_code:
+            raise ValueError("Course code cannot contain colons (':').")
+        if new_code != code and self.courses.contains(new_code):
+            raise ValueError("Course code already exists.")
         if not name.strip():
             raise ValueError("Course name is required.")
         if credits < 1:
             raise ValueError("Credits must be at least 1.")
+
+        if new_code != code:
+            old_vertex = self._course_vertex(code)
+            new_vertex = self._course_vertex(new_code)
+            enrolled_students = self.enrollments.neighbors(old_vertex)
+
+            self.courses.delete(code)
+            course.code = new_code
+            self.courses.insert(new_code, course)
+
+            self.enrollments.add_vertex(new_vertex)
+            for student_vertex in enrolled_students:
+                self.enrollments.add_edge(student_vertex, new_vertex)
+            self.enrollments.remove_vertex(old_vertex)
+
+            for student in self.students.values():
+                if code in student.scores:
+                    student.scores[new_code] = student.scores.pop(code)
 
         course.name = name.strip()
         course.credits = credits
