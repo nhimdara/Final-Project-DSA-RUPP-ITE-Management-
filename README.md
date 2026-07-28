@@ -27,7 +27,7 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements-dev.txt
 Copy-Item .env.example .env
-uvicorn api.main:app --reload
+python -m uvicorn api.main:app --reload
 ```
 
 Environment variables may be set in the shell before starting the server.
