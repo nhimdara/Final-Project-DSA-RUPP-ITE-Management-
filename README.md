@@ -1,7 +1,78 @@
-# Simple Student Management System
+# Student Management System
+
+This project now has two interfaces:
+
+- A professional FastAPI REST API backed by a relational database.
+- The original educational console application demonstrating custom data
+  structures.
+
+## FastAPI system
+
+The API includes:
+
+- SQLAlchemy 2 database models and transactions
+- SQLite by default; PostgreSQL can be selected with `DATABASE_URL`
+- JWT bearer authentication with Argon2 password hashing
+- Administrator, teacher, student, and parent authorization
+- Student and course CRUD with validation, search, and pagination
+- Enrollment, score recording, letter grades, and credit-weighted GPA reports
+- Automatic one-time import of the demo data from `data.py`
+- Interactive OpenAPI and ReDoc documentation
+- Integration tests for authentication, authorization, and academic workflows
+
+### Install and run
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements-dev.txt
+Copy-Item .env.example .env
+uvicorn api.main:app --reload
+```
+
+Environment variables may be set in the shell before starting the server.
+Replace `SECRET_KEY` in any deployed environment. The default database is
+created as `student_management.db` in the project directory.
+
+Open:
+
+- API documentation: <http://127.0.0.1:8000/docs>
+- Alternative documentation: <http://127.0.0.1:8000/redoc>
+- Health check: <http://127.0.0.1:8000/health>
+
+Use the `/api/v1/auth/token` form in Swagger to sign in, or click
+**Authorize**. The existing demo administrator login is `admin` / `admin123`.
+
+Run the automated tests with:
+
+```powershell
+pytest -q
+```
+
+### Main API routes
+
+| Method | Route | Purpose |
+| --- | --- | --- |
+| `POST` | `/api/v1/auth/token` | Sign in and receive a JWT |
+| `GET` | `/api/v1/auth/me` | View the signed-in account |
+| `GET/POST` | `/api/v1/students` | Search/list or create students |
+| `GET/PATCH/DELETE` | `/api/v1/students/{student_id}` | Student CRUD |
+| `GET` | `/api/v1/students/{student_id}/report` | Courses, grades, and GPA |
+| `GET/POST` | `/api/v1/courses` | Search/list or create courses |
+| `GET/PATCH/DELETE` | `/api/v1/courses/{code}` | Course CRUD |
+| `POST` | `/api/v1/enrollments` | Enroll a student |
+| `PUT` | `/api/v1/enrollments/{id}/score` | Record or replace a score |
+| `DELETE` | `/api/v1/enrollments/{id}` | Remove an enrollment |
+| `POST` | `/api/v1/users` | Create a role-controlled user |
+
+For production, use a PostgreSQL URL such as
+`postgresql+psycopg://user:password@host/database` and install the
+`psycopg[binary]` driver.
+
+## Original console system
 
 A small console project that uses data structures directly. It does not use
-MVC, a database, or third-party packages.
+MVC or third-party packages. It remains available for the DSA demonstration.
 
 ## Combined data structures
 
@@ -45,7 +116,7 @@ The generic student and parent accounts ask for a student ID after login. Use
 `S001` or `S002` with the initial data. Courses `DS101` and `MATH101`,
 enrollments, and example scores are included so every menu can be tested.
 
-## Run
+## Run the console application
 
 ```powershell
 python main.py
