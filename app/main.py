@@ -1,4 +1,8 @@
+from pathlib import Path
+
 from fastapi import FastAPI
+from fastapi.responses import FileResponse
+from fastapi.staticfiles import StaticFiles
 
 from app.routes import auth, courses, enrollments, students
 
@@ -13,10 +17,13 @@ app.include_router(students.router, prefix="/api/v1")
 app.include_router(courses.router, prefix="/api/v1")
 app.include_router(enrollments.router, prefix="/api/v1")
 
+static_dir = Path(__file__).parent / "static"
+app.mount("/static", StaticFiles(directory=static_dir), name="static")
 
-@app.get("/", tags=["System"])
+
+@app.get("/", include_in_schema=False)
 def root():
-    return {"name": app.title, "version": app.version, "docs": "/docs"}
+    return FileResponse(static_dir / "index.html")
 
 
 @app.get("/health", tags=["System"])

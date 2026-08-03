@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Campus — Student Management</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/styles.css">
+  <link rel="stylesheet" href="/static/auth.css">
+</head>
+<body>
+  <div id="loginView" class="login-shell">
+    <section class="login-brand">
+      <div class="brand"><span class="brand-mark">C</span><span>Campus</span></div>
+      <div class="hero-copy">
+        <span class="eyebrow">STUDENT INFORMATION SYSTEM</span>
+        <h1>Everything academic,<br><em>beautifully organized.</em></h1>
+        <p>Manage students, courses, enrollment, scores, and academic performance from one focused workspace.</p>
+      </div>
+      <div class="orb orb-one"></div><div class="orb orb-two"></div>
+    </section>
+    <section class="login-panel">
+      <form id="loginForm" class="login-card">
+        <div class="mobile-brand brand"><span class="brand-mark">C</span><span>Campus</span></div>
+        <span class="eyebrow">WELCOME BACK</span>
+        <h2>Sign in to Campus</h2>
+        <p class="muted">Use your school account to continue.</p>
+        <label>Username<input id="username" value="admin" autocomplete="username" required></label>
+        <label>Password<input id="password" type="password" value="admin123" autocomplete="current-password" required></label>
+        <button class="primary wide" type="submit">Sign in <span>→</span></button>
+        <div class="demo-accounts"><button type="button" data-demo="admin|admin123">Admin</button><button type="button" data-demo="teacher|teacher123">Teacher</button><button type="button" data-demo="student|student123">Student</button><button type="button" data-demo="parent|parent123">Parent</button></div>
+      </form>
+    </section>
+  </div>
+
+  <div id="appView" class="app-shell hidden">
+    <aside class="sidebar">
+      <div class="brand"><span class="brand-mark">C</span><span>Campus</span></div>
+      <nav>
+        <button class="nav-item active" data-page="dashboard"><span>⌂</span> Overview</button>
+        <button class="nav-item" data-page="students"><span>♙</span> Students</button>
+        <button class="nav-item" data-page="courses"><span>▤</span> Courses</button>
+        <button class="nav-item" data-page="academics"><span>◎</span> <span id="academicsNavLabel">Academics</span></button>
+      </nav>
+      <div class="sidebar-foot">
+        <a href="/docs" target="_blank">API documentation ↗</a>
+        <button id="logoutBtn" class="nav-item"><span>↪</span> Sign out</button>
+      </div>
+    </aside>
+
+    <main>
+      <header class="topbar">
+        <button id="menuBtn" class="icon-button">☰</button>
+        <div><span class="eyebrow">INFORMATION TECHNOLOGY</span><h2 id="pageTitle">Overview</h2></div>
+        <div class="profile"><div><b id="profileName">Administrator</b><small id="profileRole">administrator</small></div><span class="avatar">AD</span></div>
+      </header>
+
+      <div class="content">
+        <section id="dashboardPage" class="page active">
+          <div class="welcome-card">
+            <div><span class="eyebrow light">ACADEMIC WORKSPACE</span><h1>Good day, <span id="welcomeName">Administrator</span>.</h1><p>Your school data is up to date and ready to manage.</p></div>
+            <button class="ghost-light" data-go="students">View students →</button>
+          </div>
+          <div class="stats-grid">
+            <article class="stat-card"><span class="stat-icon mint">♙</span><div><small>TOTAL STUDENTS</small><strong id="studentCount">—</strong><p>Active student records</p></div></article>
+            <article class="stat-card"><span class="stat-icon amber">▤</span><div><small>ACTIVE COURSES</small><strong id="courseCount">—</strong><p>Available this term</p></div></article>
+            <article class="stat-card"><span class="stat-icon blue">◎</span><div><small>DEPARTMENT</small><strong class="text-stat">ITE</strong><p>Information Technology</p></div></article>
+          </div>
+          <div class="panel"><div class="panel-head"><div><span class="eyebrow">RECENT DIRECTORY</span><h3>Students</h3></div><button class="text-button" data-go="students">View all →</button></div><div id="recentStudents" class="compact-list"></div></div>
+        </section>
+
+        <section id="studentsPage" class="page">
+          <div class="section-head"><div><span class="eyebrow">DIRECTORY</span><h1 id="studentsHeading">Students</h1><p id="studentsDescription">Manage student profiles and view academic progress.</p></div><button id="addStudentBtn" class="primary admin-only">+ Add student</button></div>
+          <div class="toolbar"><input id="studentSearch" class="search" placeholder="Search by name or student ID..."><span id="studentTotal" class="muted"></span></div>
+          <div class="table-card"><table><thead><tr><th>Student</th><th>Department</th><th>Year</th><th></th></tr></thead><tbody id="studentRows"></tbody></table></div>
+        </section>
+
+        <section id="coursesPage" class="page">
+          <div class="section-head"><div><span class="eyebrow">CURRICULUM</span><h1>Courses</h1><p>Browse the academic course catalog.</p></div><button id="addCourseBtn" class="primary admin-only">+ Add course</button></div>
+          <div class="toolbar"><input id="courseSearch" class="search" placeholder="Search by course name or code..."><span id="courseTotal" class="muted"></span></div>
+          <div id="courseGrid" class="course-grid"></div>
+        </section>
+
+        <section id="academicsPage" class="page">
+          <div class="section-head"><div><span class="eyebrow">ACADEMIC RECORDS</span><h1>Enrollment & scores</h1><p>Connect students to courses and record their results.</p></div></div>
+          <div class="academic-grid">
+            <form id="enrollForm" class="panel form-panel staff-only"><span class="eyebrow">NEW ENROLLMENT</span><h3>Enroll a student</h3><label>Student<select id="enrollStudent" required></select></label><label>Course<select id="enrollCourse" required></select></label><button class="primary" type="submit">Create enrollment</button></form>
+            <form id="scoreForm" class="panel form-panel staff-only"><span class="eyebrow">ASSESSMENT</span><h3>Record a score</h3><label>Student<select id="scoreStudent" required></select></label><label>Course<select id="scoreCourse" required></select></label><label>Score<input id="scoreValue" type="number" min="0" max="100" step="0.1" placeholder="0–100" required></label><button class="primary" type="submit">Save score</button></form>
+            <form id="reportForm" class="panel form-panel report-picker"><span class="eyebrow">PERFORMANCE</span><h3>Academic report</h3><label>Choose student<select id="reportStudent" required></select></label><button class="secondary" type="submit">Generate report</button></form>
+          </div>
+          <div id="reportResult" class="panel report-panel hidden"></div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <dialog id="editorDialog"><form id="editorForm" method="dialog"><div class="dialog-head"><div><span id="dialogEyebrow" class="eyebrow"></span><h2 id="dialogTitle"></h2></div><button type="button" id="closeDialog" class="icon-button">×</button></div><div id="dialogFields"></div><div class="dialog-actions"><button type="button" id="cancelDialog" class="secondary">Cancel</button><button type="submit" class="primary">Save changes</button></div></form></dialog>
+  <div id="toast" class="toast"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>

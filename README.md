@@ -39,7 +39,8 @@ python -m scripts.seed_database
 python -m uvicorn app.main:app --reload
 ```
 
-Open `http://127.0.0.1:8000/docs` for the interactive Swagger UI or
+Open `http://127.0.0.1:8000` for the web dashboard. Open
+`http://127.0.0.1:8000/docs` for the interactive Swagger UI or
 `http://127.0.0.1:8000/redoc` for ReDoc. The API exposes student and course
 CRUD, login, enrollment, scoring, GPA, and academic-report endpoints.
 The API uses SQLite by default and stores its data in `student_management.db`.
@@ -62,3 +63,18 @@ scripts/         database seed commands
 ```
 
 All application endpoints are versioned under `/api/v1`.
+
+## Authentication and permissions
+
+Login at `/api/v1/auth/login` to receive a bearer token. The web dashboard
+stores the token for the browser session and sends it with every API request.
+
+- Administrators can manage students, courses, enrollments, and scores.
+- Teachers can view students and courses, manage enrollments and scores, and
+  view academic reports.
+- Students can view courses and only their own linked profile and report.
+- Parents can view courses and only their linked student's profile and report.
+
+For deployment, copy `.env.example` to `.env` and replace `TOKEN_SECRET` with a
+long random value. The included student and parent demo accounts are linked to
+student `S001`.
