@@ -11,11 +11,7 @@ USERS = ({'username': 'admin',
  {'username': 'student', 'password': 'student123', 'role': 'student', 'student_id': ''},
  {'username': 'teacher', 'password': 'teacher123', 'role': 'teacher', 'student_id': ''})
 
-<<<<<<< HEAD
-STUDENTS = ({'student_id': 'S001', 'name': 'Nhim Dara', 'year': 2},
-=======
 STUDENTS = ({'student_id': 'S001', 'name': 'Chea', 'year': 3},
->>>>>>> origin/dev
  {'student_id': 'S002', 'name': 'Sok Dara', 'year': 2},
  {'student_id': 'S003', 'name': 'Keo Rotha', 'year': 2},
  {'student_id': 'S004', 'name': 'Chea Boring', 'year': 2},
@@ -106,10 +102,6 @@ ENROLLMENTS = ({'student_id': 'S001', 'course_code': 'APL101'},
  {'student_id': 'S016', 'course_code': 'DB101'})
 
 SCORES = ({'student_id': 'S001', 'course_code': 'APL101', 'score': 90.0},
-<<<<<<< HEAD
- {'student_id': 'S001', 'course_code': 'CS101', 'score': 88},
-=======
->>>>>>> origin/dev
  {'student_id': 'S001', 'course_code': 'DB101', 'score': 90},
  {'student_id': 'S001', 'course_code': 'DS101', 'score': 88},
  {'student_id': 'S001', 'course_code': 'MATH101', 'score': 92},
