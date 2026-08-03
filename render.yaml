@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: student-management-system
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m alembic upgrade head && python -m scripts.seed_database && python -m uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: TOKEN_SECRET
+        generateValue: true
+      - key: PYTHON_VERSION
+        value: 3.13.5
