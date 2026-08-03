@@ -20,12 +20,18 @@ def seed() -> None:
             if db.get(Course, code) is None:
                 db.add(Course(code=code, name=item["name"], credits=item["credits"]))
         for item in USERS:
+            student_id = item.get("student_id") or linked_students.get(item["username"])
+            password_hash = hash_password(item["password"])
             user = db.get(User, item["username"])
             if user is None:
-                db.add(User(username=item["username"], password_hash=hash_password(item["password"]),
-                            role=item["role"], student_id=item.get("student_id") or linked_students.get(item["username"])))
-            elif not user.student_id and item["username"] in linked_students:
-                user.student_id = linked_students[item["username"]]
+                db.add(User(username=item["username"], password_hash=password_hash,
+                            role=item["role"], student_id=student_id))
+            else:
+                # Keep the bundled/demo database compatible when the password
+                # hashing implementation or account metadata changes.
+                user.password_hash = password_hash
+                user.role = item["role"]
+                user.student_id = student_id
         db.flush()
         scores = {(item["student_id"].upper(), item["course_code"].upper()): item["score"]
                   for item in SCORES}
