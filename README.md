@@ -79,8 +79,8 @@ stores the token for the browser session and sends it with every API request.
 - Teachers can view students and courses, manage enrollments and scores, and
   view academic reports.
 - Students can view courses and only their own linked profile and report.
-- Parents must provide an existing student ID when logging in, and can view
-  courses and only the selected student's profile and report for that session.
+- Students and parents must provide a student ID when logging in. A student ID
+  must match the student's linked account; parents can select an existing student.
 
 For deployment, copy `.env.example` to `.env` and replace `TOKEN_SECRET` with a
 long random value. The student demo account is linked to `S001`; the generic

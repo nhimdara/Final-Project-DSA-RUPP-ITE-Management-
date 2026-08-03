@@ -13,12 +13,14 @@ router = APIRouter(prefix="/auth", tags=["Authentication"])
 def login(body: LoginRequest, db: Session = Depends(get_db)):
     user = authenticate(db, body.username, body.password)
     selected_student_id = user.student_id
-    if user.role == "parent":
+    if user.role in {"student", "parent"}:
         if not body.student_id:
-            raise HTTPException(400, "Student ID is required for parent login.")
+            raise HTTPException(400, f"Student ID is required for {user.role} login.")
         selected_student_id = body.student_id.strip().upper()
         if db.get(Student, selected_student_id) is None:
             raise HTTPException(404, "Student ID was not found.")
+        if user.role == "student" and user.student_id != selected_student_id:
+            raise HTTPException(403, "Student ID does not match this account.")
     return {"username": user.username, "role": user.role, "student_id": selected_student_id,
             "access_token": create_access_token(user, selected_student_id), "token_type": "bearer"}
 
