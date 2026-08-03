@@ -1,17 +1,11 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # Simple Student Management System
+=======
+# Student Management System API
+>>>>>>> origin/dev
 
-A small console project that uses data structures directly. It does not use
-MVC, a database, or third-party packages.
-
-## Combined data structures
-
-The main implementations are combined in `data_structures/student_management.py`:
-
-- `HashTable` stores students, courses, and users for fast key lookup.
-- `Graph` connects students to the courses in which they are enrolled.
-- `GradeDecisionTree` converts numeric scores into grades and GPA values.
-- `StudentManagementSystem` coordinates all three structures.
+A layered FastAPI application using SQLAlchemy, Alembic, Pydantic, and SQLite.
 
 ## Features
 
@@ -21,17 +15,14 @@ The main implementations are combined in `data_structures/student_management.py`
 - Enroll a student in a course
 - Reject duplicate enrollment with a clear error
 - Record scores and calculate GPA on a 4.0 scale
-- Print a student's course report
-- Let students view their enrolled courses and credit-weighted GPA
-- Let teachers select a course and input scores for its enrolled students
-- Ask student and parent users for a valid student ID before displaying records
-- Let student and parent accounts view student information and GPA separately
-- Use breadth-first search (BFS) to find the shortest enrollment path between
-  any two students or courses
+- Generate a student's academic report and credit-weighted GPA
+- Search students and courses
+- Validate requests using Pydantic schemas
+- Persist records in a relational database
+- Version endpoints under `/api/v1`
 
-Users, students, courses, enrollments, and scores are stored in `data.py`.
-Changes made through the console are written back to that file automatically,
-so they remain available after the program restarts.
+The `data.py` file contains legacy initial records used only by the idempotent
+database seed command. Runtime changes are stored in the configured database.
 
 ## Demo accounts
 
@@ -42,26 +33,43 @@ so they remain available after the program restarts.
 | Student | `student` | `student123` |
 | Parent | `parent` | `parent123` |
 
-The generic student and parent accounts ask for a student ID after login. Use
-`S001` or `S002` with the initial data. Courses `CS101` and `MATH101`,
-enrollments, and example scores are included so every menu can be tested.
-
 ## Run
 
+Install the API dependencies and start the development server:
+
 ```powershell
-python main.py
+python -m pip install -r requirements.txt
+python -m alembic upgrade head
+python -m scripts.seed_database
+python -m uvicorn app.main:app --reload
 ```
 
-The program only needs Python 3.9 or newer.
+Open `http://127.0.0.1:8000` for the web dashboard. Open
+`http://127.0.0.1:8000/docs` for the interactive Swagger UI or
+`http://127.0.0.1:8000/redoc` for ReDoc. The API exposes student and course
+CRUD, login, enrollment, scoring, GPA, and academic-report endpoints.
+The API uses SQLite by default and stores its data in `student_management.db`.
+Set the `DATABASE_URL` environment variable to use another SQLAlchemy-supported
+database. Alembic manages schema changes; `scripts/seed_database.py` imports the
+existing records from `data.py` and is safe to run more than once.
 
-## System diagrams
+The API follows a conventional layered structure:
 
-- [Use-case diagram](assets/diagrams/usecase.png) ([editable SVG](assets/diagrams/usecase.svg))
-- [System architecture diagram](assets/diagrams/system_diagram.png) ([editable SVG](assets/diagrams/system_diagram.svg))
-- [Application flowchart](assets/diagrams/flowchart.png) ([editable SVG](assets/diagrams/flowchart.svg))
+```text
+app/
+  controllers/   business logic and database operations
+  models/        SQLAlchemy database models
+  routes/        FastAPI endpoint definitions
+  schemas/       Pydantic request and response models
+  database.py    engine and session configuration
+  main.py        application setup
+migrations/      Alembic database migrations
+scripts/         database seed commands
+```
 
-## Algorithm notes
+All application endpoints are versioned under `/api/v1`.
 
+<<<<<<< HEAD
 - `HashTable` is a custom array-of-buckets implementation using separate
   chaining. Python's `hash()` only calculates the bucket index; storage,
   collision handling, lookup, update, and deletion are implemented manually.
@@ -146,3 +154,20 @@ The program only needs Python 3.9 or newer.
   no recorded score are displayed as pending and are excluded from GPA; they
   are not treated as failures.
 >>>>>>> 010243d87f91d0817bcec308e41046eb1ea346bd
+=======
+## Authentication and permissions
+
+Login at `/api/v1/auth/login` to receive a bearer token. The web dashboard
+stores the token for the browser session and sends it with every API request.
+
+- Administrators can manage students, courses, enrollments, and scores.
+- Teachers can view students and courses, manage enrollments and scores, and
+  view academic reports.
+- Students can view courses and only their own linked profile and report.
+- Parents must provide an existing student ID when logging in, and can view
+  courses and only the selected student's profile and report for that session.
+
+For deployment, copy `.env.example` to `.env` and replace `TOKEN_SECRET` with a
+long random value. The student demo account is linked to `S001`; the generic
+parent demo account selects an existing student ID during login.
+>>>>>>> origin/dev
