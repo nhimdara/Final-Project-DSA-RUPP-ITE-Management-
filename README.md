@@ -85,3 +85,13 @@ stores the token for the browser session and sends it with every API request.
 For deployment, copy `.env.example` to `.env` and replace `TOKEN_SECRET` with a
 long random value. The student demo account is linked to `S001`; the generic
 parent demo account selects an existing student ID during login.
+
+## Deploy to Render
+
+The included `render.yaml` defines a free Render web service. Create a new
+Blueprint in Render and connect this repository; Render will install the
+dependencies, run the migrations, seed the demo records, and start Uvicorn.
+
+Free Render services use an ephemeral filesystem, so runtime database changes
+are reset to the seeded demo data after a restart or redeploy. Use a persistent
+disk or a managed PostgreSQL database if changes must be retained permanently.
