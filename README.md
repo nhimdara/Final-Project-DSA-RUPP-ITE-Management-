@@ -1,4 +1,4 @@
-# Simple Student Management System
+# Student Management System
 
 A small console project that uses data structures directly. It does not use
 MVC, a database, or third-party packages.
@@ -44,13 +44,27 @@ The generic student and parent accounts ask for a student ID after login. Use
 `S001` or `S002` with the initial data. Courses `CS101` and `MATH101`,
 enrollments, and example scores are included so every menu can be tested.
 
-## Run
+## Run the console app
 
 ```powershell
 python main.py
 ```
 
-The program only needs Python 3.9 or newer.
+The program needs Python 3.10 or newer.
+
+## Run as a FastAPI web API
+
+Install the API dependencies and start the development server:
+
+```powershell
+python -m pip install -r requirements.txt
+python -m uvicorn api:app --reload
+```
+
+Open `http://127.0.0.1:8000/docs` for the interactive Swagger UI or
+`http://127.0.0.1:8000/redoc` for ReDoc. The API exposes student and course
+CRUD, login, enrollment, scoring, GPA/report, graph, and grade-tree endpoints.
+It uses the same data-structure service and persists changes to `data.py`.
 
 ## System diagrams
 
