@@ -4,6 +4,7 @@ import base64
 import json
 import os
 import time
+from dataclasses import dataclass
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
@@ -15,6 +16,13 @@ from app.models import User
 TOKEN_SECRET = os.getenv("TOKEN_SECRET", "change-this-secret-in-production")
 TOKEN_LIFETIME = 8 * 60 * 60
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+
+
+@dataclass(frozen=True)
+class AuthenticatedUser:
+    username: str
+    role: str
+    student_id: str | None
 
 
 def hash_password(password: str, salt: str = "student-management") -> str:
@@ -29,15 +37,16 @@ def authenticate(db: Session, username: str, password: str) -> User:
     return user
 
 
-def create_access_token(user: User) -> str:
+def create_access_token(user: User, student_id: str | None = None) -> str:
     payload = {"sub": user.username, "role": user.role,
-               "student_id": user.student_id, "exp": int(time.time()) + TOKEN_LIFETIME}
+               "student_id": student_id if student_id is not None else user.student_id,
+               "exp": int(time.time()) + TOKEN_LIFETIME}
     encoded = base64.urlsafe_b64encode(json.dumps(payload, separators=(",", ":")).encode()).decode().rstrip("=")
     signature = hmac.new(TOKEN_SECRET.encode(), encoded.encode(), hashlib.sha256).hexdigest()
     return f"{encoded}.{signature}"
 
 
-def current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
+def current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> AuthenticatedUser:
     credentials_error = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Invalid or expired authentication token.",
@@ -54,20 +63,21 @@ def current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_
         user = db.get(User, payload.get("sub"))
         if user is None or user.role != payload.get("role"):
             raise credentials_error
-        return user
+        return AuthenticatedUser(username=user.username, role=user.role,
+                                 student_id=payload.get("student_id"))
     except (ValueError, TypeError, json.JSONDecodeError):
         raise credentials_error
 
 
 def allow_roles(*roles: str):
-    def dependency(user: User = Depends(current_user)) -> User:
+    def dependency(user: AuthenticatedUser = Depends(current_user)) -> AuthenticatedUser:
         if user.role not in roles:
             raise HTTPException(status.HTTP_403_FORBIDDEN, "You do not have permission for this action.")
         return user
     return dependency
 
 
-def require_student_access(student_id: str, user: User) -> None:
+def require_student_access(student_id: str, user: AuthenticatedUser) -> None:
     if user.role in {"administrator", "teacher"}:
         return
     if user.role in {"student", "parent"} and user.student_id == student_id.strip().upper():

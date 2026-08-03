@@ -94,9 +94,11 @@ async function generateReport(id) {
 }
 
 function enterApp() { $("profileName").textContent = state.user.username; $("profileRole").textContent = state.user.role; $("welcomeName").textContent = state.user.username; $("loginView").classList.add("hidden"); $("appView").classList.remove("hidden"); applyRole(); return loadData(); }
-$("loginForm").addEventListener("submit", async e => { e.preventDefault(); try { state.user = await request("/auth/login", {method:"POST", body:JSON.stringify({username:$("username").value, password:$("password").value})}); sessionStorage.setItem("campus_token", state.user.access_token); sessionStorage.setItem("campus_user", JSON.stringify(state.user)); await enterApp(); } catch(err) { toast(err.message, true); } });
+function updateParentField() { const parent = $("username").value.trim().toLowerCase() === "parent"; $("parentStudentField").classList.toggle("hidden", !parent); $("parentStudentId").required = parent; }
+$("username").addEventListener("input", updateParentField);
+$("loginForm").addEventListener("submit", async e => { e.preventDefault(); try { state.user = await request("/auth/login", {method:"POST", body:JSON.stringify({username:$("username").value, password:$("password").value, student_id:$("parentStudentId").value || null})}); sessionStorage.setItem("campus_token", state.user.access_token); sessionStorage.setItem("campus_user", JSON.stringify(state.user)); await enterApp(); } catch(err) { toast(err.message, true); } });
 $("logoutBtn").onclick = () => { state.user = null; sessionStorage.removeItem("campus_token"); sessionStorage.removeItem("campus_user"); $("appView").classList.add("hidden"); $("loginView").classList.remove("hidden"); go("dashboard"); };
-document.querySelectorAll("[data-demo]").forEach(button => button.onclick = () => { const [user,password] = button.dataset.demo.split("|"); $("username").value=user; $("password").value=password; });
+document.querySelectorAll("[data-demo]").forEach(button => button.onclick = () => { const [user,password] = button.dataset.demo.split("|"); $("username").value=user; $("password").value=password; $("parentStudentId").value = ""; updateParentField(); if (user === "parent") $("parentStudentId").focus(); });
 document.querySelectorAll("[data-page]").forEach(x => x.onclick = () => go(x.dataset.page));
 document.querySelectorAll("[data-go]").forEach(x => x.onclick = () => go(x.dataset.go));
 $("menuBtn").onclick = () => document.querySelector(".sidebar").classList.toggle("open");
